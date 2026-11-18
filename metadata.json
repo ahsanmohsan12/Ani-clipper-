@@ -1,0 +1,6 @@
+{
+  "name": "ClipForge Studio — Nonlinear Video & Commentary Editor",
+  "description": "Frame-accurate multi-track timeline video editor with keyframe reframe, word-level captioning, transformative commentary tools, rights management, and server-side CRF 16 FFmpeg rendering.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
