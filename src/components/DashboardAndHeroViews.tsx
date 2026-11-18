@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   DASHBOARD_PROJECT_CARDS,
   type DashboardProjectCard,
 } from '../editor/defaultProject';
+import { triggerMp4ShortDownload } from '../editor/exportHelper';
 
 export const ClipForgeLogoMark: React.FC = () => (
   <div className="flex items-center gap-space-xs select-none">
@@ -33,13 +34,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     'https://youtube.com/live/stream?v=agi-summit-horizon-2025-mainstage'
   );
   const [viralityFilter, setViralityFilter] = useState<'all' | 'high' | 'moderate'>('all');
+  const [sortMode, setSortMode] = useState<'virality' | 'duration'>('virality');
   const [scanningToast, setScanningToast] = useState<string | null>(null);
+  const uploadInputRef = useRef<HTMLInputElement | null>(null);
 
   const filteredCards = DASHBOARD_PROJECT_CARDS.filter((c) => {
     if (viralityFilter === 'high') return c.viralityScore >= 90;
     if (viralityFilter === 'moderate') return c.viralityScore < 90;
     return true;
-  });
+  }).sort((a, b) =>
+    sortMode === 'virality'
+      ? b.viralityScore - a.viralityScore
+      : a.durationFormatted.localeCompare(b.durationFormatted)
+  );
 
   const handleFindMoments = () => {
     setScanningToast('Dual Whisper-Large V3 + Vision Saliency synced 8 viral hooks');
@@ -120,9 +127,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span className="material-symbols-outlined text-[16px]">link</span>
                 <span>URL Source</span>
               </button>
+              <input
+                ref={uploadInputRef}
+                type="file"
+                accept="video/*,image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const cleanTitle = file.name.replace(/\.[^.]+$/, '');
+                  setStreamUrl(`local://${file.name}`);
+                  setScanningToast(`Ingested "${file.name}" — opening in Studio Editor...`);
+                  const isImage = file.type.startsWith('image/');
+                  const previewUrl = isImage
+                    ? URL.createObjectURL(file)
+                    : DASHBOARD_PROJECT_CARDS[0].thumbnailUrl;
+                  onOpenInEditor({
+                    ...DASHBOARD_PROJECT_CARDS[0],
+                    title: cleanTitle || 'Uploaded Clip',
+                    thumbnailUrl: previewUrl,
+                  });
+                }}
+              />
               <button
                 type="button"
-                onClick={() => setIngestSourceMode('upload')}
+                onClick={() => {
+                  setIngestSourceMode('upload');
+                  uploadInputRef.current?.click();
+                }}
                 className={`px-space-md py-space-xs rounded text-body-sm font-title-md flex items-center gap-space-xs transition-colors cursor-pointer ${
                   ingestSourceMode === 'upload'
                     ? 'bg-primary text-on-primary shadow-sm'
@@ -389,14 +421,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         <div className="flex items-center gap-space-sm self-end md:self-auto">
-          <div className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface text-body-sm font-title-md">
+          <button
+            type="button"
+            onClick={() =>
+              setSortMode((prev) => (prev === 'virality' ? 'duration' : 'virality'))
+            }
+            className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface text-body-sm font-title-md cursor-pointer transition-colors"
+          >
             <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
               swap_vert
             </span>
             <span>
-              Sort by: <strong className="text-primary font-semibold">Highest Virality</strong>
+              Sort by:{' '}
+              <strong className="text-primary font-semibold">
+                {sortMode === 'virality' ? 'Highest Virality' : 'Shortest Duration'}
+              </strong>
             </span>
-          </div>
+          </button>
         </div>
       </section>
 
@@ -1271,19 +1312,21 @@ export const ViralHeroView: React.FC<ViralHeroViewProps> = ({
                   <p className="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 mb-2.5">
                     {item.desc}
                   </p>
-                  <a
-                    href={`/api/export/quick-mp4?title=${encodeURIComponent(
-                      item.title
-                    )}&aspect=9:16&image=${encodeURIComponent(item.img)}`}
-                    download={`clipforge_${item.title
-                      .toLowerCase()
-                      .replace(/[^a-z0-9]+/g, '_')}.mp4`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full py-1.5 px-space-sm rounded-lg bg-surface-container-high hover:bg-primary hover:text-on-primary text-primary font-title-md text-body-sm flex items-center justify-center gap-1.5 transition-colors"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      triggerMp4ShortDownload({
+                        title: item.title,
+                        aspectRatio: '9:16',
+                        imageUrl: item.img,
+                      });
+                    }}
+                    className="w-full py-1.5 px-space-sm rounded-lg bg-surface-container-high hover:bg-primary hover:text-on-primary text-primary font-title-md text-body-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[16px]">download</span>
                     <span>Download Short (.MP4)</span>
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}

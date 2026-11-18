@@ -7,6 +7,7 @@ import {
   clamp,
 } from '../editor/engine';
 import type { CaptionVisualPreset } from '../editor/defaultProject';
+import { studioAudio } from '../editor/audioSynth';
 
 interface PreviewMonitorProps {
   project: ProjectState;
@@ -52,12 +53,23 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
   onQuickDownloadMp4,
 }) => {
   const [isDraggingHud, setIsDraggingHud] = useState(false);
+  const [masterVol, setMasterVol] = useState(() => studioAudio.getMasterVolume());
+  const [masterMuted, setMasterMuted] = useState(() => studioAudio.isMasterMuted());
+
   const dragOriginRef = useRef<{
     startX: number;
     startY: number;
     origX: number;
     origY: number;
   } | null>(null);
+
+  const anyTrackSolo = Object.values(project.mixer).some((m) => m.solo);
+  const isTrackVisible = (trackId: keyof ProjectState['mixer']) => {
+    const trackState = project.mixer[trackId];
+    if (trackState.muted) return false;
+    if (anyTrackSolo && !trackState.solo) return false;
+    return true;
+  };
 
   const activeVideoClip =
     project.clips.find(
@@ -74,24 +86,27 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
         playheadTime <= c.startTime + c.duration
     );
 
-  const activeOverlays = project.clips.filter(
-    (c) =>
-      c.trackId === 'overlay' &&
-      !c.muted &&
-      playheadTime >= c.startTime &&
-      playheadTime <= c.startTime + c.duration
-  );
+  const activeOverlays = isTrackVisible('overlay')
+    ? project.clips.filter(
+        (c) =>
+          c.trackId === 'overlay' &&
+          !c.muted &&
+          playheadTime >= c.startTime &&
+          playheadTime <= c.startTime + c.duration
+      )
+    : [];
 
-  const activeCaptionClip =
-    project.clips.find(
-      (c) =>
-        c.trackId === 'captions' &&
-        !c.muted &&
-        playheadTime >= c.startTime &&
-        playheadTime <= c.startTime + c.duration
-    ) ||
-    project.clips.find((c) => c.id === 'clip_cap_2') ||
-    project.clips.find((c) => c.trackId === 'captions');
+  const activeCaptionClip = isTrackVisible('captions')
+    ? project.clips.find(
+        (c) =>
+          c.trackId === 'captions' &&
+          !c.muted &&
+          playheadTime >= c.startTime &&
+          playheadTime <= c.startTime + c.duration
+      ) ||
+      project.clips.find((c) => c.id === 'clip_cap_2' && !c.muted) ||
+      project.clips.find((c) => c.trackId === 'captions' && !c.muted)
+    : undefined;
 
   const interpTransform = activeVideoClip
     ? interpolateTransformAtTime(activeVideoClip, playheadTime)
@@ -170,8 +185,8 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
     'top-left': 'top-10 left-3',
   };
 
-  const wordsToRender =
-    activeCaptionClip?.captions && activeCaptionClip.captions.length > 0
+  const wordsToRender = activeCaptionClip
+    ? activeCaptionClip.captions && activeCaptionClip.captions.length > 0
       ? activeCaptionClip.captions
       : [
           { id: 'w1', word: 'THE', startOffset: 0, endOffset: 0.7 },
@@ -180,7 +195,20 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
           { id: 'w4', word: 'INTELLIGENCE', startOffset: 2.0, endOffset: 3.4, highlight: true },
           { id: 'w5', word: 'IS', startOffset: 3.4, endOffset: 3.9 },
           { id: 'w6', word: 'HERE', startOffset: 3.9, endOffset: 4.5 },
-        ];
+        ]
+    : [];
+
+  const captionFontScale = clamp(
+    (activeCaptionClip?.captionStyle?.fontSize ?? 48) / 48,
+    0.65,
+    1.35
+  );
+  const captionFontFamily =
+    activeCaptionClip?.captionStyle?.fontFamily === 'Montserrat'
+      ? '"Plus Jakarta Sans", "Inter", sans-serif'
+      : activeCaptionClip?.captionStyle?.fontFamily === 'Impact Ultra'
+      ? 'Impact, "Space Grotesk", sans-serif'
+      : '"Space Grotesk", sans-serif';
 
   const highlightChipClass =
     activeCaptionPresetId === 'mr-beast'
@@ -196,7 +224,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
       aria-label="Frame-Accurate Preview Monitor"
       className="flex-1 flex flex-col bg-surface relative overflow-hidden items-center justify-between p-2 sm:p-space-md min-w-0 select-none"
     >
-      {/* Stage Breadcrumb & Ratio Controls (Exact match to code_a5f5c0ca.html) */}
+      {/* Stage Breadcrumb & Ratio Controls */}
       <div className="w-full flex items-center justify-between px-1 sm:px-space-sm gap-1.5 sm:gap-2 flex-wrap">
         <div className="flex items-center gap-space-xs font-label-md text-[11px] sm:text-label-md text-on-surface-variant min-w-0">
           <span className="text-secondary font-bold shrink-0">LIVE FRAME SCRUB</span>
@@ -285,7 +313,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
         </div>
       </div>
 
-      {/* Phone Viewport Stage (9:16 Mockup matching code_a5f5c0ca.html) */}
+      {/* Phone Viewport Stage (9:16 Mockup) */}
       <div className="relative flex-1 flex items-center justify-center my-1 w-full max-h-[300px] sm:max-h-[410px] lg:max-h-[490px] min-h-[195px]">
         <div
           data-testid="preview-canvas-stage"
@@ -325,7 +353,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
                   onError={(e) => {
                     const img = e.currentTarget;
                     if (!img.src.includes('commentary_creator_cam_1794941711189.jpg')) {
-                      img.src = '/src/assets/images/commentary_creator_cam_1794941711189.jpg';
+                      img.src = '/assets/images/commentary_creator_cam_1794941711189.jpg';
                     }
                   }}
                 />
@@ -372,14 +400,14 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             </div>
           </div>
 
-          {/* Freeze-Frame Active Badge if playhead is on a freeze segment */}
+          {/* Freeze-Frame Active Badge */}
           {activeVideoClip?.isFreezeFrame && (
             <div className="relative z-20 mx-auto px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-[10px] font-bold shadow-lg">
               FREEZE FRAME HOLD • {formatTimecode(activeVideoClip.freezeFrameTime ?? playheadTime, project.fps)}
             </div>
           )}
 
-          {/* AI Speaker Lock Bounding Box (Centering indicator) */}
+          {/* AI Speaker Lock Bounding Box */}
           {autoReframeActive && (
             <div
               style={{
@@ -388,13 +416,13 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
               className="absolute top-[19%] left-[14%] right-[14%] h-[36%] rounded-xl pointer-events-none flex flex-col justify-between p-1.5 shadow-[0_0_20px_rgba(202,190,255,0.15)] bg-primary/5 border border-primary/25"
             >
               <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center gap-1 bg-surface-container-lowest/90 px-1.5 py-0.5 rounded-md text-[9px] font-label-sm text-primary truncate">
+                <div className="hidden sm:flex items-center gap-1 bg-surface-container-lowest/90 px-1.5 py-0.5 rounded-md text-[9px] font-label-sm text-primary truncate">
                   <span className="material-symbols-outlined text-[11px]">
                     center_focus_strong
                   </span>
                   <span>AI SPEAKER LOCK (98.4%)</span>
                 </div>
-                <span className="text-[9px] font-label-sm text-secondary bg-surface-container-lowest/90 px-1 rounded shrink-0">
+                <span className="text-[9px] font-label-sm text-secondary bg-surface-container-lowest/90 px-1 rounded shrink-0 ml-auto">
                   X: {542 + interpTransform.x} Y: {380 + interpTransform.y}
                 </span>
               </div>
@@ -423,7 +451,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             </div>
           )}
 
-          {/* Active V2 Graphic Overlays (Arrows, Callouts, Title Cards) */}
+          {/* Active V2 Graphic Overlays */}
           {activeOverlays.map((ovClip) => {
             const ov = ovClip.overlay;
             if (!ov) return null;
@@ -489,32 +517,48 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             );
           })}
 
-          {/* Center Kinetic Hormozi-Style Captions Overlay (Exact match to code_a5f5c0ca.html) */}
+          {/* Center Kinetic Captions Overlay */}
           <div className="relative z-10 px-1.5 sm:px-space-sm mb-3 sm:mb-8 flex flex-col items-center text-center pointer-events-none mt-auto">
-            <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-1.5 gap-y-0.5 sm:gap-y-1">
-              {wordsToRender.map((w) => {
-                const isHot = Boolean(w.highlight) || w.word.toUpperCase() === 'INTELLIGENCE';
-                if (isHot) {
-                  return (
-                    <span key={w.id} className="relative inline-block">
-                      <span
-                        className={`font-display text-[13px] sm:text-[20px] lg:text-[22px] leading-4 sm:leading-7 uppercase tracking-tight ${highlightChipClass}`}
-                      >
-                        {w.word}
+            {wordsToRender.length > 0 && (
+              <div
+                style={{
+                  fontFamily: captionFontFamily,
+                  transform: `scale(${captionFontScale.toFixed(2)})`,
+                }}
+                className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-1.5 gap-y-0.5 sm:gap-y-1 transition-transform duration-150"
+              >
+                {wordsToRender.map((w) => {
+                  const localClipSec = activeCaptionClip
+                    ? playheadTime - activeCaptionClip.startTime
+                    : -1;
+                  const isSpokenNow =
+                    localClipSec >= w.startOffset && localClipSec <= w.endOffset;
+                  const isHot =
+                    isSpokenNow ||
+                    Boolean(w.highlight) ||
+                    w.word.toUpperCase() === 'INTELLIGENCE';
+                  if (isHot) {
+                    return (
+                      <span key={w.id} className="relative inline-block">
+                        <span
+                          className={`text-[13px] sm:text-[20px] lg:text-[22px] leading-4 sm:leading-7 uppercase tracking-tight ${highlightChipClass}`}
+                        >
+                          {w.word}
+                        </span>
                       </span>
+                    );
+                  }
+                  return (
+                    <span
+                      key={w.id}
+                      className="text-[13px] sm:text-[20px] lg:text-[22px] leading-4 sm:leading-7 uppercase tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] opacity-90 font-bold"
+                    >
+                      {w.word}
                     </span>
                   );
-                }
-                return (
-                  <span
-                    key={w.id}
-                    className="font-display text-[13px] sm:text-[20px] lg:text-[22px] leading-4 sm:leading-7 uppercase tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] opacity-90 font-bold"
-                  >
-                    {w.word}
-                  </span>
-                );
-              })}
-            </div>
+                })}
+              </div>
+            )}
 
             {/* Auto-Generated Animated Hook Sticker Badge + End-of-Clip Download Action */}
             <div className="mt-1.5 sm:mt-space-sm flex flex-wrap items-center justify-center gap-1 pointer-events-auto">
@@ -551,7 +595,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
         </div>
       </div>
 
-      {/* Playback Transport Controller Bar (Exact match to code_a5f5c0ca.html) */}
+      {/* Playback Transport Controller Bar */}
       <div className="w-full max-w-2xl bg-surface-container-low px-2.5 sm:px-space-md py-1 sm:py-space-xs rounded-full flex items-center justify-between shadow-lg my-0.5 gap-1 sm:gap-2">
         <div className="flex items-center gap-0.5 sm:gap-space-xs text-on-surface-variant">
           <button
@@ -668,14 +712,36 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
           )}
         </div>
 
-        {/* Volume Slider Quick Toggle */}
+        {/* Interactive Master Volume Control */}
         <div className="hidden md:flex items-center gap-space-xs">
-          <span className="material-symbols-outlined text-[18px] text-on-surface-variant">
-            volume_up
-          </span>
-          <div className="w-14 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-            <div className="h-full bg-primary rounded-full w-3/4" />
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const nextMuted = !masterMuted;
+              studioAudio.setMasterMuted(nextMuted);
+              setMasterMuted(nextMuted);
+            }}
+            aria-label={masterMuted ? 'Unmute master preview audio' : 'Mute master preview audio'}
+            className="text-on-surface-variant hover:text-on-surface cursor-pointer flex items-center"
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              {masterMuted || masterVol === 0 ? 'volume_off' : 'volume_up'}
+            </span>
+          </button>
+          <input
+            type="range"
+            aria-label="Master preview volume"
+            min={0}
+            max={100}
+            value={masterMuted ? 0 : Math.round(masterVol * 100)}
+            onChange={(e) => {
+              const v = Number(e.target.value) / 100;
+              studioAudio.setMasterVolume(v);
+              setMasterVol(v);
+              setMasterMuted(v === 0);
+            }}
+            className="w-14 h-1.5 accent-primary cursor-pointer"
+          />
         </div>
       </div>
     </section>

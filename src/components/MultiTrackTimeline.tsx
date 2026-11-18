@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   type ProjectState,
   type TrackId,
@@ -67,9 +67,11 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
   onTriggerFreezeFrame,
 }) => {
   const rulerRef = useRef<HTMLDivElement | null>(null);
+  const [isScrubbingRuler, setIsScrubbingRuler] = useState(false);
   const selectedClip = project.clips.find((c) => c.id === selectedClipId) || null;
 
   const totalTimelineWidth = Math.max(920, Math.ceil((project.duration + 3) * pixelsPerSecond));
+  const anyTrackSolo = Object.values(project.mixer).some((m) => m.solo);
 
   const handleRulerSeek = (clientX: number) => {
     if (!rulerRef.current) return;
@@ -84,7 +86,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
       aria-label="Multi-Track Timeline Editor"
       className="h-52 lg:h-64 bg-surface-container-low flex flex-col flex-shrink-0 z-30 shadow-2xl relative select-none"
     >
-      {/* Timeline Global Toolbar (Exact match to code_a5f5c0ca.html) */}
+      {/* Timeline Global Toolbar */}
       <div className="h-10 bg-surface-container px-2 sm:px-space-md flex items-center justify-between flex-shrink-0 gap-2 overflow-x-auto">
         <div className="flex items-center gap-space-sm">
           {/* Track Quick Actions */}
@@ -268,9 +270,8 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
 
       {/* Timeline Workspace (Tracks Pane + Sequencer Canvas) */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left Track Header Labels Rail (`w-28 sm:w-40 lg:w-48 bg-surface-container-low`) */}
+        {/* Left Track Header Labels Rail */}
         <div className="w-28 sm:w-40 lg:w-48 bg-surface-container-low flex flex-col flex-shrink-0 shadow-sm z-20">
-          {/* Top spacer aligning with 24px Ruler */}
           <div className="h-6 px-1.5 sm:px-space-sm flex items-center justify-between text-[9px] sm:text-[10px] font-label-sm text-outline bg-surface-container-lowest/60">
             <span>TRACKS</span>
             <span>{project.clips.length} CLIPS</span>
@@ -332,14 +333,22 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
         {/* Right Sequencer Stage Area */}
         <div className="flex-1 overflow-x-auto overflow-y-hidden relative bg-surface-container-lowest flex flex-col">
           <div style={{ width: `${totalTimelineWidth}px` }} className="relative h-full flex flex-col">
-            {/* Ruler Time Tick Marks Bar */}
+            {/* Ruler Time Tick Marks Bar with Pointer Scrubbing */}
             <div
               ref={rulerRef}
-              onClick={(e) => handleRulerSeek(e.clientX)}
-              onTouchMove={(e) => {
-                if (e.touches[0]) handleRulerSeek(e.touches[0].clientX);
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                setIsScrubbingRuler(true);
+                handleRulerSeek(e.clientX);
               }}
-              className="h-6 bg-surface-container-lowest flex items-center relative text-[10px] font-label-sm text-outline select-none cursor-pointer"
+              onPointerMove={(e) => {
+                if (isScrubbingRuler) {
+                  handleRulerSeek(e.clientX);
+                }
+              }}
+              onPointerUp={() => setIsScrubbingRuler(false)}
+              onPointerCancel={() => setIsScrubbingRuler(false)}
+              className="h-6 bg-surface-container-lowest flex items-center relative text-[10px] font-label-sm text-outline select-none cursor-pointer touch-none"
             >
               {Array.from({ length: Math.ceil(project.duration + 3) }).map((_, sec) => {
                 if (sec % 2 !== 0) return null;
@@ -358,7 +367,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
               })}
             </div>
 
-            {/* Active Yellow Playhead Needle (Global Indicator matching code_a5f5c0ca.html) */}
+            {/* Active Yellow Playhead Needle */}
             <div
               style={{ left: `${playheadTime * pixelsPerSecond}px` }}
               className="absolute top-0 bottom-0 w-[2px] bg-secondary z-30 pointer-events-none shadow-[0_0_12px_#ffe083]"
@@ -370,6 +379,10 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
             <div className="flex-1 flex flex-col justify-around">
               {TRACK_CONFIG.map((track) => {
                 const trackClips = project.clips.filter((c) => c.trackId === track.id);
+                const mixerState = project.mixer[track.id];
+                const isTrackSilenced =
+                  mixerState.muted || (anyTrackSolo && !mixerState.solo);
+
                 return (
                   <div
                     key={track.id}
@@ -381,14 +394,15 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
                         onSeek(clamp(clickX / pixelsPerSecond, 0, project.duration));
                       }
                     }}
-                    className="h-[31px] relative flex items-center px-1 hover:bg-surface-container/30 transition-colors"
+                    className={`h-[31px] relative flex items-center px-1 hover:bg-surface-container/30 transition-all ${
+                      isTrackSilenced ? 'opacity-40' : ''
+                    }`}
                   >
                     {trackClips.map((clip: TimelineClip) => {
                       const leftPx = clip.startTime * pixelsPerSecond;
                       const widthPx = Math.max(44, clip.duration * pixelsPerSecond);
                       const isSelected = clip.id === selectedClipId;
 
-                      // Track 1 Lane: Video Footage (`Lex_Sam_Clip_01.mp4`)
                       if (track.id === 'video') {
                         return (
                           <button
@@ -423,7 +437,6 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
                         );
                       }
 
-                      // Track 2 Lane: Captions (Segmented word blocks with glowing yellow `[HOT]` highlight)
                       if (track.id === 'captions') {
                         const isHotBlock = clip.name.includes('[HOT]');
                         return (
@@ -454,7 +467,6 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
                         );
                       }
 
-                      // Track 3 Lane: SFX (Waveform audio blocks)
                       if (track.id === 'sfx') {
                         return (
                           <button
@@ -480,7 +492,6 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
                         );
                       }
 
-                      // Track 4 Lane: Music Track (Phonk Beats)
                       if (track.id === 'music') {
                         return (
                           <button
@@ -511,7 +522,6 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
                         );
                       }
 
-                      // Track 5 & 6: Voiceover & Overlays
                       return (
                         <button
                           key={clip.id}

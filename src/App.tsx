@@ -37,6 +37,8 @@ import {
   MobileCompanionView,
   ViralHeroView,
 } from './components/DashboardAndHeroViews';
+import { triggerMp4ShortDownload } from './editor/exportHelper';
+import { studioAudio } from './editor/audioSynth';
 
 export type WorkspaceScreen = 'editor' | 'dashboard' | 'mobile' | 'landing';
 
@@ -340,11 +342,20 @@ export default function App() {
   };
 
   const handleSaveProjectToServer = async () => {
-    await fetch('/api/projects/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ project }),
-    });
+    try {
+      localStorage.setItem('clipforge_saved_project_v1', JSON.stringify(project));
+    } catch {
+      // Ignore storage quota errors
+    }
+    try {
+      await fetch('/api/projects/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project }),
+      });
+    } catch {
+      // Offline / static host fallback already saved in localStorage
+    }
   };
 
   const handleOpenDashboardCardInEditor = (card?: DashboardProjectCard) => {
@@ -364,19 +375,13 @@ export default function App() {
 
   const handleQuickDownloadShortMp4 = () => {
     const primaryClip = project.clips.find((c) => c.trackId === 'video');
-    const url = `/api/export/quick-mp4?title=${encodeURIComponent(
-      project.title
-    )}&aspect=${encodeURIComponent(project.aspectRatio)}&image=${encodeURIComponent(
-      primaryClip?.thumbnailUrl || '/src/assets/images/commentary_creator_cam_1794941711189.jpg'
-    )}`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `clipforge_${project.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')}_crf16.mp4`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    triggerMp4ShortDownload({
+      title: project.title,
+      aspectRatio: project.aspectRatio,
+      imageUrl:
+        primaryClip?.thumbnailUrl ||
+        '/src/assets/images/commentary_creator_cam_1794941711189.jpg',
+    });
   };
 
   const rightsState = computeProjectRightsState(project.baseDescription, project.rights);
@@ -848,14 +853,20 @@ export default function App() {
                     activeCaptionPresetId={activeCaptionPresetId}
                     activeTransition={activeTransition}
                     autoReframeActive={autoReframeActive}
-                    onTogglePlay={() => setIsPlaying((p) => !p)}
+                    onTogglePlay={() => {
+                      setIsPlaying((p) => {
+                        if (!p) studioAudio.triggerTransportCue('play');
+                        return !p;
+                      });
+                    }}
                     onToggleLoop={() => setLoopPlayback((l) => !l)}
                     onSeek={(t) => setPlayheadTime(clamp(t, 0, project.duration))}
-                    onStepFrames={(delta) =>
+                    onStepFrames={(delta) => {
+                      studioAudio.triggerTransportCue('step');
                       setPlayheadTime((t) =>
                         stepFrame(t, delta, project.fps, project.duration)
-                      )
-                    }
+                      );
+                    }}
                     onChangeAspectRatio={(ratio) =>
                       commitProjectChange((prev) => ({ ...prev, aspectRatio: ratio }))
                     }

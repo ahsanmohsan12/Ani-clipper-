@@ -56,10 +56,12 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
   onUpdateCommentaryConfig,
   onInsertFreezeFrame,
   onSaveProjectToServer,
+  onLoadProjectState,
 }) => {
   const [customPresets, setCustomPresets] = useState<StylePreset[]>([]);
   const [newPresetName, setNewPresetName] = useState('');
   const [saveBanner, setSaveBanner] = useState<string | null>(null);
+  const importFileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const [overlayText, setOverlayText] = useState('Key Horizon Shift');
   const [overlaySubtext, setOverlaySubtext] = useState('Speaker #1 Analysis');
@@ -707,14 +709,40 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
               <div className="flex flex-col gap-space-sm">
                 <div className="p-space-sm rounded-xl bg-surface-container flex flex-col gap-2">
                   <span className="font-title-md text-body-sm text-on-surface font-semibold">
-                    Save / Export Project State
+                    Save / Load Project State
                   </span>
+                  <input
+                    ref={importFileInputRef}
+                    type="file"
+                    accept=".json,application/json"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        try {
+                          const parsed = JSON.parse(String(reader.result)) as ProjectState;
+                          if (parsed && parsed.id && Array.isArray(parsed.clips)) {
+                            onLoadProjectState(parsed);
+                            setSaveBanner(`Loaded "${parsed.title}"`);
+                            setTimeout(() => setSaveBanner(null), 2500);
+                          }
+                        } catch {
+                          setSaveBanner('Invalid project JSON file');
+                          setTimeout(() => setSaveBanner(null), 2500);
+                        }
+                      };
+                      reader.readAsText(file);
+                      e.target.value = '';
+                    }}
+                  />
                   <div className="grid grid-cols-2 gap-1.5">
                     <button
                       type="button"
                       onClick={async () => {
                         await onSaveProjectToServer();
-                        setSaveBanner('Project saved to studio server');
+                        setSaveBanner('Project saved to studio storage');
                         setTimeout(() => setSaveBanner(null), 2500);
                       }}
                       className="py-2 px-2 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-bold cursor-pointer"
@@ -723,10 +751,41 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
                     </button>
                     <button
                       type="button"
+                      onClick={() => {
+                        try {
+                          const raw = localStorage.getItem('clipforge_saved_project_v1');
+                          if (raw) {
+                            const parsed = JSON.parse(raw) as ProjectState;
+                            if (parsed && parsed.id && Array.isArray(parsed.clips)) {
+                              onLoadProjectState(parsed);
+                              setSaveBanner(`Restored "${parsed.title}"`);
+                              setTimeout(() => setSaveBanner(null), 2500);
+                              return;
+                            }
+                          }
+                        } catch {
+                          // Ignore storage error
+                        }
+                        setSaveBanner('No saved project in local storage yet');
+                        setTimeout(() => setSaveBanner(null), 2500);
+                      }}
+                      className="py-2 px-2 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm font-semibold cursor-pointer"
+                    >
+                      Load Saved
+                    </button>
+                    <button
+                      type="button"
                       onClick={handleExportProjectJson}
-                      className="py-2 px-2 rounded-lg bg-surface-container-high text-on-surface font-label-sm text-label-sm cursor-pointer"
+                      className="py-2 px-2 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm cursor-pointer"
                     >
                       Export JSON
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => importFileInputRef.current?.click()}
+                      className="py-2 px-2 rounded-lg bg-surface-container-high hover:bg-surface-bright text-secondary font-label-sm text-label-sm cursor-pointer"
+                    >
+                      Import JSON
                     </button>
                   </div>
                 </div>

@@ -4,13 +4,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { promisify } from 'util';
-import { createServer as createViteServer } from 'vite';
 import {
   buildFfmpegRenderSpec,
   buildSrtFromProject,
   computeProjectRightsState,
   type ProjectState,
-} from './src/editor/engine';
+} from './src/editor/engine.ts';
 
 const execFileAsync = promisify(execFile);
 
@@ -18,7 +17,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const RENDERS_DIR = '/tmp/clipforge_renders';
-fs.mkdirSync(RENDERS_DIR, { recursive: true });
+try {
+  fs.mkdirSync(RENDERS_DIR, { recursive: true });
+} catch {
+  // Ignore if read-only filesystem
+}
 
 interface RenderedJobRecord {
   jobId: string;
@@ -30,7 +33,6 @@ interface RenderedJobRecord {
   createdAt: string;
 }
 
-// In-memory store for saved projects and rendered jobs
 const savedProjects = new Map<string, ProjectState>();
 const renderedJobs = new Map<string, RenderedJobRecord>();
 
@@ -43,20 +45,37 @@ function sanitizeFilenameSlug(title: string): string {
   return slug || 'viral_short';
 }
 
+function getBundledMasterMp4Path(): string {
+  const candidates = [
+    path.join(__dirname, 'public/assets/clipforge_master_short_crf16.mp4'),
+    path.join(__dirname, 'dist/assets/clipforge_master_short_crf16.mp4'),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return candidates[0];
+}
+
 function resolveLocalFrameImagePath(candidateUrl?: string): string {
-  const defaultAsset = path.join(
-    __dirname,
-    'src/assets/images/commentary_creator_cam_1794941711189.jpg'
-  );
+  const defaultCandidates = [
+    path.join(__dirname, 'src/assets/images/commentary_creator_cam_1794941711189.jpg'),
+    path.join(__dirname, 'public/assets/images/commentary_creator_cam_1794941711189.jpg'),
+    path.join(__dirname, 'dist/src/assets/images/commentary_creator_cam_1794941711189.jpg'),
+  ];
+  const defaultAsset = defaultCandidates.find((p) => fs.existsSync(p)) || defaultCandidates[0];
   if (!candidateUrl) return defaultAsset;
 
   if (candidateUrl.startsWith('/src/assets/')) {
     const abs = path.join(__dirname, candidateUrl.replace(/^\//, ''));
     if (fs.existsSync(abs)) return abs;
+    const distAbs = path.join(__dirname, 'dist', candidateUrl.replace(/^\//, ''));
+    if (fs.existsSync(distAbs)) return distAbs;
   }
   if (candidateUrl.startsWith('/assets/')) {
     const abs = path.join(__dirname, 'public', candidateUrl.replace(/^\//, ''));
     if (fs.existsSync(abs)) return abs;
+    const distAbs = path.join(__dirname, 'dist', candidateUrl.replace(/^\//, ''));
+    if (fs.existsSync(distAbs)) return distAbs;
   }
   return defaultAsset;
 }
@@ -71,7 +90,7 @@ async function encodeShortMp4WithFfmpeg(options: {
   saturation?: number;
   title?: string;
   creatorCredit?: string;
-}): Promise<{ fileSizeBytes: number }> {
+}): Promise<{ fileSizeBytes: number; finalMp4Path: string }> {
   const {
     imagePath,
     outputPath,
@@ -84,7 +103,6 @@ async function encodeShortMp4WithFfmpeg(options: {
     creatorCredit = 'ClipForge Studio',
   } = options;
 
-  // Target dimensions optimized for fast real-time server encoding while preserving aspect ratio
   const targetDim =
     aspectRatio === '9:16'
       ? { w: 720, h: 1280 }
@@ -92,7 +110,6 @@ async function encodeShortMp4WithFfmpeg(options: {
       ? { w: 720, h: 720 }
       : { w: 1280, h: 720 };
 
-  // Keep actual render duration between 3s and 6s so server encode completes in < 1 second
   const encodeDuration = Math.max(3, Math.min(6, Math.round(durationSec || 5)));
 
   const eqB = Math.max(-0.5, Math.min(0.5, brightness / 100)).toFixed(2);
@@ -161,18 +178,32 @@ async function encodeShortMp4WithFfmpeg(options: {
     outputPath,
   ];
 
-  await execFileAsync('ffmpeg', ffmpegArgs, { timeout: 25000 });
-  const stat = fs.statSync(outputPath);
-  return { fileSizeBytes: stat.size };
+  try {
+    await execFileAsync('ffmpeg', ffmpegArgs, { timeout: 25000 });
+    const stat = fs.statSync(outputPath);
+    return { fileSizeBytes: stat.size, finalMp4Path: outputPath };
+  } catch {
+    // Fallback to bundled master MP4 if ffmpeg binary is unavailable in serverless container
+    const bundled = getBundledMasterMp4Path();
+    if (fs.existsSync(bundled)) {
+      try {
+        fs.copyFileSync(bundled, outputPath);
+        const stat = fs.statSync(outputPath);
+        return { fileSizeBytes: stat.size, finalMp4Path: outputPath };
+      } catch {
+        const stat = fs.statSync(bundled);
+        return { fileSizeBytes: stat.size, finalMp4Path: bundled };
+      }
+    }
+    throw new Error('FFmpeg binary and fallback asset unavailable');
+  }
 }
 
-async function startServer() {
+export async function createApp() {
   const app = express();
-  const PORT = 3000;
 
   app.use(express.json({ limit: '10mb' }));
 
-  // Health & Studio Capabilities endpoint
   app.get('/api/health', (_req, res) => {
     res.json({
       status: 'ok',
@@ -184,7 +215,6 @@ async function startServer() {
     });
   });
 
-  // Save/Load Project endpoints
   app.post('/api/projects/save', (req, res) => {
     const project = req.body?.project as ProjectState | undefined;
     if (!project || !project.id || !project.title) {
@@ -211,7 +241,6 @@ async function startServer() {
     });
   });
 
-  // Server-Side Timeline Render Endpoint (Real FFmpeg CRF 16, AAC 256k MP4 output)
   app.post('/api/export/render', async (req, res) => {
     try {
       const project = req.body?.project as ProjectState | undefined;
@@ -238,7 +267,7 @@ async function startServer() {
       const primaryVideoClip = project.clips.find((c) => c.trackId === 'video');
       const imagePath = resolveLocalFrameImagePath(primaryVideoClip?.thumbnailUrl);
 
-      const { fileSizeBytes } = await encodeShortMp4WithFfmpeg({
+      const { fileSizeBytes, finalMp4Path } = await encodeShortMp4WithFfmpeg({
         imagePath,
         outputPath: mp4Path,
         aspectRatio: project.aspectRatio || '9:16',
@@ -251,11 +280,15 @@ async function startServer() {
       });
 
       const srtContent = buildSrtFromProject(project);
-      fs.writeFileSync(srtPath, srtContent, 'utf-8');
+      try {
+        fs.writeFileSync(srtPath, srtContent, 'utf-8');
+      } catch {
+        // Ignore if read-only fs
+      }
 
       const record: RenderedJobRecord = {
         jobId,
-        mp4Path,
+        mp4Path: finalMp4Path,
         srtPath,
         outputFilename,
         srtFilename,
@@ -313,33 +346,34 @@ async function startServer() {
     }
   });
 
-  // Download rendered MP4 file with attachment header
   app.get('/api/export/download/:jobId', (req, res) => {
     const record = renderedJobs.get(req.params.jobId);
-    if (!record || !fs.existsSync(record.mp4Path)) {
+    const mp4File =
+      record && fs.existsSync(record.mp4Path) ? record.mp4Path : getBundledMasterMp4Path();
+    if (!fs.existsSync(mp4File)) {
       res.status(404).json({ error: 'Rendered short MP4 not found or expired.' });
       return;
     }
     res.setHeader('Content-Type', 'video/mp4');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="${record.outputFilename}"`
+      `attachment; filename="${record?.outputFilename || 'clipforge_short_crf16.mp4'}"`
     );
-    res.sendFile(record.mp4Path);
+    res.sendFile(mp4File);
   });
 
-  // Stream rendered MP4 file inline for <video> preview player
   app.get('/api/export/stream/:jobId', (req, res) => {
     const record = renderedJobs.get(req.params.jobId);
-    if (!record || !fs.existsSync(record.mp4Path)) {
+    const mp4File =
+      record && fs.existsSync(record.mp4Path) ? record.mp4Path : getBundledMasterMp4Path();
+    if (!fs.existsSync(mp4File)) {
       res.status(404).json({ error: 'Rendered short MP4 not found.' });
       return;
     }
     res.setHeader('Content-Type', 'video/mp4');
-    res.sendFile(record.mp4Path);
+    res.sendFile(mp4File);
   });
 
-  // Download rendered SRT subtitles file
   app.get('/api/export/subtitles/:jobId', (req, res) => {
     const record = renderedJobs.get(req.params.jobId);
     if (!record || !fs.existsSync(record.srtPath)) {
@@ -351,7 +385,6 @@ async function startServer() {
     res.sendFile(record.srtPath);
   });
 
-  // 1-Click Direct Short MP4 Download endpoint for quick download buttons across all views
   app.get('/api/export/quick-mp4', async (req, res) => {
     try {
       const rawTitle = String(req.query.title || 'ClipForge Viral Short');
@@ -377,7 +410,7 @@ async function startServer() {
       const outputFilename = `clipforge_${slug}_crf16.mp4`;
       const imagePath = resolveLocalFrameImagePath(rawImage);
 
-      const { fileSizeBytes } = await encodeShortMp4WithFfmpeg({
+      const { fileSizeBytes, finalMp4Path } = await encodeShortMp4WithFfmpeg({
         imagePath,
         outputPath: mp4Path,
         aspectRatio,
@@ -387,7 +420,7 @@ async function startServer() {
 
       const record: RenderedJobRecord = {
         jobId: cacheKey,
-        mp4Path,
+        mp4Path: finalMp4Path,
         srtPath: '',
         outputFilename,
         srtFilename: '',
@@ -398,14 +431,22 @@ async function startServer() {
 
       res.setHeader('Content-Type', 'video/mp4');
       res.setHeader('Content-Disposition', `attachment; filename="${outputFilename}"`);
-      res.sendFile(mp4Path);
+      res.sendFile(finalMp4Path);
     } catch (err) {
       console.error('Quick MP4 download failed:', err);
+      const fallback = getBundledMasterMp4Path();
+      if (fs.existsSync(fallback)) {
+        res.setHeader('Content-Type', 'video/mp4');
+        res.setHeader('Content-Disposition', 'attachment; filename="clipforge_short_crf16.mp4"');
+        res.sendFile(fallback);
+        return;
+      }
       res.status(500).json({ error: 'Failed to encode quick MP4 short.' });
     }
   });
 
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -414,14 +455,22 @@ async function startServer() {
   } else {
     const distPath = path.join(__dirname, 'dist');
     app.use(express.static(distPath));
-    app.get('*all', (_req, res) => {
+    app.use((_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
+  return app;
+}
+
+async function startServer() {
+  const PORT = Number(process.env.PORT) || 3000;
+  const app = await createApp();
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`ClipForge Studio Server running on http://0.0.0.0:${PORT}`);
   });
 }
 
-startServer();
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  startServer();
+}

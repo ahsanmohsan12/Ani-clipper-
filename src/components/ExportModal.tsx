@@ -5,6 +5,12 @@ import {
   buildSrtFromProject,
   computeProjectRightsState,
 } from '../editor/engine';
+import {
+  type ServerRenderResponse,
+  renderProjectWithFallback,
+  triggerMp4ShortDownload,
+  sanitizeSlug,
+} from '../editor/exportHelper';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -12,19 +18,7 @@ interface ExportModalProps {
   project: ProjectState;
 }
 
-export interface ServerRenderResponse {
-  status: string;
-  jobId: string;
-  completedAt: string;
-  outputFilename: string;
-  srtFilename: string;
-  fileSizeBytes: number;
-  downloadUrl: string;
-  streamUrl: string;
-  subtitlesUrl: string;
-  totalFrames: number;
-  stages: Array<{ step: number; name: string; detail: string }>;
-}
+export type { ServerRenderResponse };
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, project }) => {
   const [isRendering, setIsRendering] = useState(false);
@@ -37,24 +31,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
     setIsRendering(true);
     setRenderError(null);
     try {
-      const response = await fetch('/api/export/render', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ project }),
-      });
-      if (!response.ok) {
-        throw new Error(`Render request failed (${response.status})`);
-      }
-      const data = (await response.json()) as ServerRenderResponse;
+      const data = await renderProjectWithFallback(project);
       setRenderResult(data);
     } catch (err) {
-      setRenderError(err instanceof Error ? err.message : 'Server render failed');
+      setRenderError(err instanceof Error ? err.message : 'Render failed');
     } finally {
       setIsRendering(false);
     }
   }, [project]);
 
-  // Automatically render the short when the modal opens at the end of clipping
   useEffect(() => {
     if (isOpen) {
       handleRunServerRender();
@@ -68,24 +53,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
   const spec = buildFfmpegRenderSpec(project);
   const rightsState = computeProjectRightsState(project.baseDescription, project.rights);
   const primaryClip = project.clips.find((c) => c.trackId === 'video');
-  const quickMp4Href = `/api/export/quick-mp4?title=${encodeURIComponent(
-    project.title
-  )}&aspect=${encodeURIComponent(project.aspectRatio)}&image=${encodeURIComponent(
-    primaryClip?.thumbnailUrl || '/src/assets/images/commentary_creator_cam_1794941711189.jpg'
-  )}`;
 
-  const handleDownloadMp4 = () => {
-    const targetUrl = renderResult?.downloadUrl || quickMp4Href;
+  const handleDownloadMp4 = async () => {
     const filename =
       renderResult?.outputFilename ||
-      `clipforge_${project.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_crf16.mp4`;
-    const a = document.createElement('a');
-    a.href = targetUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+      `clipforge_${sanitizeSlug(project.title)}_crf16.mp4`;
     setDownloadTriggeredToast(`Downloading ${filename}...`);
+    await triggerMp4ShortDownload({
+      title: project.title,
+      aspectRatio: project.aspectRatio,
+      imageUrl: primaryClip?.thumbnailUrl,
+      explicitDownloadUrl: renderResult?.downloadUrl,
+      explicitFilename: filename,
+    });
     setTimeout(() => setDownloadTriggeredToast(null), 3500);
   };
 
@@ -95,7 +75,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
     const url = URL.createObjectURL(blob);
     const filename =
       renderResult?.srtFilename ||
-      `clipforge_${project.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_captions.srt`;
+      `clipforge_${sanitizeSlug(project.title)}_captions.srt`;
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
@@ -135,24 +115,24 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
       role="dialog"
       aria-modal="true"
       aria-labelledby="export-modal-title"
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 select-none"
     >
       <div className="w-full max-w-3xl bg-surface-container-low border border-outline-variant/40 rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="px-5 py-4 bg-surface-container border-b border-outline-variant/30 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+        <div className="px-4 sm:px-5 py-3.5 sm:py-4 bg-surface-container border-b border-outline-variant/30 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary shrink-0">
               <span className="material-symbols-outlined text-[20px]">movie_edit</span>
             </div>
-            <div>
+            <div className="min-w-0">
               <h2
                 id="export-modal-title"
-                className="font-headline-md text-title-md text-on-surface"
+                className="font-headline-md text-body-md sm:text-title-md text-on-surface truncate"
               >
                 Render &amp; Download Viral Short (.MP4)
               </h2>
-              <p className="font-label-sm text-label-sm text-on-surface-variant">
-                Server-Side FFmpeg Master Encode • CRF 16 • AAC 256k • {project.aspectRatio}
+              <p className="font-label-sm text-label-sm text-on-surface-variant truncate">
+                FFmpeg Master Encode • CRF 16 • AAC 256k • {project.aspectRatio}
               </p>
             </div>
           </div>
@@ -160,19 +140,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
             type="button"
             onClick={onClose}
             aria-label="Close export dialog"
-            className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg cursor-pointer"
+            className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg cursor-pointer shrink-0"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-5 overflow-y-auto space-y-4">
+        <div className="p-4 sm:p-5 overflow-y-auto space-y-4">
           {/* Top Rendered Short Preview + Direct Download Card */}
-          <div className="p-4 bg-surface-container-lowest border border-primary/30 rounded-xl grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+          <div className="p-3.5 sm:p-4 bg-surface-container-lowest border border-primary/30 rounded-xl grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
             {/* Inline Video Player Preview */}
             <div className="md:col-span-4 flex flex-col items-center">
-              <div className="w-full max-w-[175px] aspect-[9/16] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/40 relative shadow-lg flex items-center justify-center">
+              <div className="w-full max-w-[165px] sm:max-w-[175px] aspect-[9/16] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/40 relative shadow-lg flex items-center justify-center">
                 {renderResult?.streamUrl ? (
                   <video
                     key={renderResult.jobId}
@@ -199,15 +179,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
             {/* Download Controls & File Metadata */}
             <div className="md:col-span-8 flex flex-col justify-between space-y-3">
               <div className="flex items-start justify-between gap-2">
-                <div>
+                <div className="min-w-0">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary/20 text-secondary font-label-sm text-[10px] font-bold uppercase mb-1">
                     <span className="material-symbols-outlined text-[13px]">verified</span>
                     {renderResult ? 'MP4 Short Ready to Download' : 'Encoding Timeline...'}
                   </span>
-                  <h3 className="font-headline-md text-headline-md text-on-surface">
+                  <h3 className="font-headline-md text-headline-md text-on-surface truncate">
                     {project.title}
                   </h3>
-                  <p className="font-label-sm text-label-sm text-on-surface-variant font-mono mt-0.5">
+                  <p className="font-label-sm text-label-sm text-on-surface-variant font-mono mt-0.5 break-all">
                     {renderResult
                       ? `${renderResult.outputFilename} • ${(
                           renderResult.fileSizeBytes / 1024
@@ -218,7 +198,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
               </div>
 
               {/* Primary Download Buttons */}
-              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 pt-1">
                 <button
                   type="button"
                   data-testid="download-mp4-button"
@@ -327,7 +307,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                 <span className="material-symbols-outlined text-[16px] text-primary">
                   terminal
                 </span>
-                <span>Server-Side FFmpeg Filtergraph &amp; Command</span>
+                <span>FFmpeg Filtergraph &amp; Command</span>
               </span>
               <button
                 type="button"
@@ -367,7 +347,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                 <div className="flex items-center gap-2 font-title-md text-body-sm text-primary">
                   <span className="material-symbols-outlined text-[18px]">task_alt</span>
                   <span>
-                    Server-Side Timeline Render Complete ({renderResult.jobId})
+                    Timeline Render Complete ({renderResult.jobId})
                   </span>
                 </div>
                 <span className="font-mono font-label-sm text-label-sm text-secondary">
