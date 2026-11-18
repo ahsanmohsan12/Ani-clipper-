@@ -112,9 +112,9 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
     return `brightness(${b.toFixed(2)}) contrast(${c.toFixed(2)}) saturate(${s.toFixed(2)}) ${presetExtra}`.trim();
   };
 
-  const handleHudMouseDown = (e: React.MouseEvent) => {
+  const handleHudPointerDown = (e: React.PointerEvent) => {
     if (!activeVideoClip) return;
-    e.preventDefault();
+    if ((e.target as HTMLElement | null)?.closest('button')) return;
     setIsDraggingHud(true);
     dragOriginRef.current = {
       startX: e.clientX,
@@ -126,7 +126,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
 
   useEffect(() => {
     if (!isDraggingHud || !activeVideoClip) return;
-    const handleMove = (e: MouseEvent) => {
+    const handleMove = (e: PointerEvent) => {
       if (!dragOriginRef.current) return;
       const dx = (e.clientX - dragOriginRef.current.startX) * 0.25;
       const dy = (e.clientY - dragOriginRef.current.startY) * 0.25;
@@ -139,11 +139,13 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
       setIsDraggingHud(false);
       dragOriginRef.current = null;
     };
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleUp);
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    window.addEventListener('pointercancel', handleUp);
     return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleUp);
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+      window.removeEventListener('pointercancel', handleUp);
     };
   }, [isDraggingHud, activeVideoClip, onUpdateClipTransform]);
 
@@ -158,7 +160,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
     project.aspectRatio === '9:16'
       ? 'h-full aspect-[9/16]'
       : project.aspectRatio === '1:1'
-      ? 'h-[360px] aspect-square'
+      ? 'h-[250px] sm:h-[360px] aspect-square'
       : 'w-full max-w-[560px] aspect-video';
 
   const pipCornerClasses: Record<ProjectState['commentary']['pipCorner'], string> = {
@@ -192,19 +194,19 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
   return (
     <section
       aria-label="Frame-Accurate Preview Monitor"
-      className="flex-1 flex flex-col bg-surface relative overflow-hidden items-center justify-between p-space-md min-w-0 select-none"
+      className="flex-1 flex flex-col bg-surface relative overflow-hidden items-center justify-between p-2 sm:p-space-md min-w-0 select-none"
     >
       {/* Stage Breadcrumb & Ratio Controls (Exact match to code_a5f5c0ca.html) */}
-      <div className="w-full flex items-center justify-between px-space-sm gap-2 flex-wrap">
-        <div className="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant">
-          <span className="text-secondary font-bold">LIVE FRAME SCRUB</span>
-          <span>•</span>
-          <span className="text-on-surface truncate">
+      <div className="w-full flex items-center justify-between px-1 sm:px-space-sm gap-1.5 sm:gap-2 flex-wrap">
+        <div className="flex items-center gap-space-xs font-label-md text-[11px] sm:text-label-md text-on-surface-variant min-w-0">
+          <span className="text-secondary font-bold shrink-0">LIVE FRAME SCRUB</span>
+          <span className="hidden sm:inline">•</span>
+          <span className="text-on-surface truncate hidden sm:inline">
             Auto-Track: Speaker #1 (Sam Altman)
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Commentary Layout Quick Pills */}
           <div className="hidden xl:flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-full">
             <button
@@ -243,52 +245,52 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
           </div>
 
           {/* Aspect Ratio Switcher Pill */}
-          <div className="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full shadow-sm">
+          <div className="flex items-center gap-1 sm:gap-space-xs bg-surface-container-low px-2 sm:px-space-sm py-1 rounded-full shadow-sm">
             <button
               type="button"
               onClick={() => onChangeAspectRatio('9:16')}
-              className={`px-space-xs font-label-sm text-label-sm cursor-pointer ${
+              className={`px-1 sm:px-space-xs font-label-sm text-[10px] sm:text-label-sm cursor-pointer ${
                 project.aspectRatio === '9:16'
                   ? 'text-primary font-semibold'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              9:16 TikTok
+              9:16
             </button>
             <span className="text-outline text-label-sm">/</span>
             <button
               type="button"
               onClick={() => onChangeAspectRatio('1:1')}
-              className={`px-space-xs font-label-sm text-label-sm cursor-pointer ${
+              className={`px-1 sm:px-space-xs font-label-sm text-[10px] sm:text-label-sm cursor-pointer ${
                 project.aspectRatio === '1:1'
                   ? 'text-primary font-semibold'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              1:1 Square
+              1:1
             </button>
             <span className="text-outline text-label-sm">/</span>
             <button
               type="button"
               onClick={() => onChangeAspectRatio('16:9')}
-              className={`px-space-xs font-label-sm text-label-sm cursor-pointer ${
+              className={`px-1 sm:px-space-xs font-label-sm text-[10px] sm:text-label-sm cursor-pointer ${
                 project.aspectRatio === '16:9'
                   ? 'text-primary font-semibold'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              16:9 Wide
+              16:9
             </button>
           </div>
         </div>
       </div>
 
       {/* Phone Viewport Stage (9:16 Mockup matching code_a5f5c0ca.html) */}
-      <div className="relative flex-1 flex items-center justify-center my-1 w-full max-h-[490px] min-h-[260px]">
+      <div className="relative flex-1 flex items-center justify-center my-1 w-full max-h-[300px] sm:max-h-[410px] lg:max-h-[490px] min-h-[195px]">
         <div
           data-testid="preview-canvas-stage"
-          onMouseDown={handleHudMouseDown}
-          className={`relative ${aspectStageClass} rounded-2xl bg-surface-container-lowest overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.85)] flex flex-col justify-between cursor-move`}
+          onPointerDown={handleHudPointerDown}
+          className={`relative ${aspectStageClass} rounded-2xl bg-surface-container-lowest overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.85)] flex flex-col justify-between cursor-move touch-none`}
         >
           {/* Split-Screen vs Single/PiP Video Layer */}
           <div className="absolute inset-0 flex pointer-events-none">
@@ -352,21 +354,21 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
           <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
           {/* Top Overlay: Viral Score Pill & REC 60FPS Badge */}
-          <div className="relative z-10 p-space-sm flex items-center justify-between">
-            <div className="flex items-center gap-1 bg-surface-container-lowest/80 backdrop-blur-md px-2 py-0.5 rounded-full shadow-sm">
+          <div className="relative z-10 p-1.5 sm:p-space-sm flex items-center justify-between gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1 bg-surface-container-lowest/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-full shadow-sm">
               <span
-                className="material-symbols-outlined text-secondary text-[14px]"
+                className="material-symbols-outlined text-secondary text-[11px] sm:text-[14px]"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 auto_fix_high
               </span>
-              <span className="font-label-sm text-label-sm font-semibold text-secondary">
-                VIRAL HOOK 99%
+              <span className="font-label-sm text-[9px] sm:text-label-sm font-semibold text-secondary whitespace-nowrap">
+                HOOK 99%
               </span>
             </div>
-            <div className="flex items-center gap-1 bg-surface-container-lowest/70 backdrop-blur-md px-2 py-0.5 rounded-full text-on-surface-variant font-label-sm text-label-sm">
+            <div className="flex items-center gap-1 bg-surface-container-lowest/70 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-full text-on-surface-variant font-label-sm text-[9px] sm:text-label-sm whitespace-nowrap">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
-              REC 60FPS
+              60FPS
             </div>
           </div>
 
@@ -488,15 +490,15 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
           })}
 
           {/* Center Kinetic Hormozi-Style Captions Overlay (Exact match to code_a5f5c0ca.html) */}
-          <div className="relative z-10 px-space-sm mb-8 flex flex-col items-center text-center pointer-events-none mt-auto">
-            <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
+          <div className="relative z-10 px-1.5 sm:px-space-sm mb-3 sm:mb-8 flex flex-col items-center text-center pointer-events-none mt-auto">
+            <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-1.5 gap-y-0.5 sm:gap-y-1">
               {wordsToRender.map((w) => {
                 const isHot = Boolean(w.highlight) || w.word.toUpperCase() === 'INTELLIGENCE';
                 if (isHot) {
                   return (
                     <span key={w.id} className="relative inline-block">
                       <span
-                        className={`font-display text-[22px] leading-7 uppercase tracking-tight ${highlightChipClass}`}
+                        className={`font-display text-[13px] sm:text-[20px] lg:text-[22px] leading-4 sm:leading-7 uppercase tracking-tight ${highlightChipClass}`}
                       >
                         {w.word}
                       </span>
@@ -506,7 +508,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
                 return (
                   <span
                     key={w.id}
-                    className="font-display text-[22px] leading-7 uppercase tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] opacity-90 font-bold"
+                    className="font-display text-[13px] sm:text-[20px] lg:text-[22px] leading-4 sm:leading-7 uppercase tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] opacity-90 font-bold"
                   >
                     {w.word}
                   </span>
@@ -515,9 +517,11 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             </div>
 
             {/* Auto-Generated Animated Hook Sticker Badge + End-of-Clip Download Action */}
-            <div className="mt-space-sm flex items-center gap-1.5 pointer-events-auto">
-              <div className="flex items-center gap-1.5 bg-primary/20 backdrop-blur-md px-3 py-1 rounded-full text-primary font-label-md text-label-md font-bold shadow-[0_0_16px_rgba(202,190,255,0.4)]">
-                <span className="material-symbols-outlined text-[16px]">psychology</span>
+            <div className="mt-1.5 sm:mt-space-sm flex flex-wrap items-center justify-center gap-1 pointer-events-auto">
+              <div className="flex items-center gap-1 bg-primary/20 backdrop-blur-md px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-primary font-label-md text-[9px] sm:text-label-md font-bold shadow-[0_0_16px_rgba(202,190,255,0.4)] whitespace-nowrap">
+                <span className="material-symbols-outlined text-[12px] sm:text-[16px]">
+                  psychology
+                </span>
                 <span>SYNTHESIS COMPLETE</span>
               </div>
               {onQuickDownloadMp4 && (
@@ -528,7 +532,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
                     onQuickDownloadMp4();
                   }}
                   title="Download Short (.MP4)"
-                  className="flex items-center gap-1 bg-secondary hover:bg-secondary-fixed-dim text-on-secondary px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold shadow-lg cursor-pointer transition-transform hover:scale-105"
+                  className="hidden sm:flex items-center gap-1 bg-secondary hover:bg-secondary-fixed-dim text-on-secondary px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold shadow-lg cursor-pointer transition-transform hover:scale-105"
                 >
                   <span className="material-symbols-outlined text-[14px]">download</span>
                   <span>MP4</span>
@@ -538,16 +542,18 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
           </div>
 
           {/* Bottom Viewport TikTok Safe Zones Indicator Guide */}
-          <div className="relative z-10 p-space-sm flex items-center justify-between text-on-surface-variant/70 font-label-sm text-label-sm">
+          <div className="relative z-10 p-1.5 sm:p-space-sm flex items-center justify-between text-on-surface-variant/70 font-label-sm text-[9px] sm:text-label-sm">
             <span>Safe Canvas Zone</span>
-            <span className="material-symbols-outlined text-[14px]">grid_4x4</span>
+            <span className="material-symbols-outlined text-[12px] sm:text-[14px]">
+              grid_4x4
+            </span>
           </div>
         </div>
       </div>
 
       {/* Playback Transport Controller Bar (Exact match to code_a5f5c0ca.html) */}
-      <div className="w-full max-w-2xl bg-surface-container-low px-space-md py-space-xs rounded-full flex items-center justify-between shadow-lg my-0.5 gap-2">
-        <div className="flex items-center gap-space-xs text-on-surface-variant">
+      <div className="w-full max-w-2xl bg-surface-container-low px-2.5 sm:px-space-md py-1 sm:py-space-xs rounded-full flex items-center justify-between shadow-lg my-0.5 gap-1 sm:gap-2">
+        <div className="flex items-center gap-0.5 sm:gap-space-xs text-on-surface-variant">
           <button
             type="button"
             onClick={() => onStepFrames(-1)}
@@ -555,7 +561,9 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             title="Step -1 Frame (←)"
             className="p-1 rounded-full hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">replay_5</span>
+            <span className="material-symbols-outlined text-[18px] sm:text-[20px]">
+              replay_5
+            </span>
           </button>
           <button
             type="button"
@@ -564,7 +572,9 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             title="Previous Cut ([)"
             className="p-1 rounded-full hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">skip_previous</span>
+            <span className="material-symbols-outlined text-[18px] sm:text-[20px]">
+              skip_previous
+            </span>
           </button>
         </div>
 
@@ -574,14 +584,14 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
           onClick={onTogglePlay}
           aria-label={isPlaying ? 'Pause playback' : 'Play timeline'}
           title="Play / Pause (Space)"
-          className="w-10 h-10 rounded-full bg-primary hover:bg-primary-fixed-dim text-on-primary flex items-center justify-center transition-transform hover:scale-105 shadow-[0_0_16px_rgba(202,190,255,0.4)] cursor-pointer shrink-0"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary hover:bg-primary-fixed-dim text-on-primary flex items-center justify-center transition-transform hover:scale-105 shadow-[0_0_16px_rgba(202,190,255,0.4)] cursor-pointer shrink-0"
         >
-          <span className="material-symbols-outlined text-[22px]">
+          <span className="material-symbols-outlined text-[20px] sm:text-[22px]">
             {isPlaying ? 'pause' : 'play_arrow'}
           </span>
         </button>
 
-        <div className="flex items-center gap-space-xs text-on-surface-variant">
+        <div className="flex items-center gap-0.5 sm:gap-space-xs text-on-surface-variant">
           <button
             type="button"
             onClick={() => onSeek(project.duration)}
@@ -589,7 +599,9 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             title="Next Cut (])"
             className="p-1 rounded-full hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">skip_next</span>
+            <span className="material-symbols-outlined text-[18px] sm:text-[20px]">
+              skip_next
+            </span>
           </button>
           <button
             type="button"
@@ -598,17 +610,19 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             title="Step +1 Frame (→)"
             className="p-1 rounded-full hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">forward_5</span>
+            <span className="material-symbols-outlined text-[18px] sm:text-[20px]">
+              forward_5
+            </span>
           </button>
         </div>
 
-        <div className="h-4 w-[1px] bg-surface-container-high" />
+        <div className="h-4 w-[1px] bg-surface-container-high shrink-0" />
 
         {/* Timecode Display */}
         <div
           data-testid="smpte-timecode-display"
           title={`SMPTE: ${formatTimecode(playheadTime, project.fps)}`}
-          className="flex items-center gap-1 font-label-md text-label-md tabular-nums"
+          className="flex items-center gap-0.5 sm:gap-1 font-label-md text-[11px] sm:text-label-md tabular-nums shrink-0"
         >
           <span className="text-secondary font-semibold">{formatTimeSecTenths(playheadTime)}</span>
           <span className="text-outline">/</span>
@@ -616,13 +630,13 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
         </div>
 
         {/* Quick Highlight, Freeze & Download Short Triggers */}
-        <div className="hidden sm:flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {activeVideoClip && (
             <button
               type="button"
               onClick={() => onTriggerZoomHighlight(activeVideoClip.id)}
               title="Add 3-Keyframe Zoom Highlight"
-              className="px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-secondary font-label-sm text-label-sm flex items-center gap-1 cursor-pointer"
+              className="hidden sm:flex px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-secondary font-label-sm text-label-sm items-center gap-1 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[14px]">zoom_in</span>
               <span>Zoom</span>
@@ -632,7 +646,7 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
             type="button"
             onClick={onTriggerFreezeFrame}
             title="Freeze Frame + Annotation"
-            className="px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-label-sm text-label-sm flex items-center gap-1 cursor-pointer"
+            className="hidden sm:flex px-2 py-0.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-label-sm text-label-sm items-center gap-1 cursor-pointer"
           >
             <span className="material-symbols-outlined text-[14px]">ac_unit</span>
             <span>Freeze</span>
@@ -643,10 +657,13 @@ export const PreviewMonitor: React.FC<PreviewMonitorProps> = ({
               data-testid="transport-download-short-btn"
               onClick={onOpenExportModal}
               title="Render & Download Short (.MP4)"
-              className="px-2.5 py-0.5 rounded-full bg-secondary/20 hover:bg-secondary/30 text-secondary font-label-sm text-label-sm font-bold flex items-center gap-1 cursor-pointer"
+              className="px-2 sm:px-2.5 py-0.5 rounded-full bg-secondary/20 hover:bg-secondary/30 text-secondary font-label-sm text-[10px] sm:text-label-sm font-bold flex items-center gap-1 cursor-pointer shrink-0"
             >
-              <span className="material-symbols-outlined text-[14px]">download</span>
-              <span>Download Short</span>
+              <span className="material-symbols-outlined text-[13px] sm:text-[14px]">
+                download
+              </span>
+              <span className="hidden sm:inline">Download Short</span>
+              <span className="inline sm:hidden">MP4</span>
             </button>
           )}
         </div>

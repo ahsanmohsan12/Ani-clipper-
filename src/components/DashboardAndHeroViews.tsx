@@ -268,21 +268,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </g>
             </svg>
 
-            <div className="w-full flex justify-between pt-1 font-label-sm text-label-sm text-outline font-mono">
+            <div className="w-full flex justify-between pt-1 font-label-sm text-[10px] sm:text-label-sm text-outline font-mono">
               <span>00:00:00</span>
-              <span>00:45:00</span>
+              <span className="hidden sm:inline">00:45:00</span>
               <span>01:30:00</span>
-              <span>02:15:00</span>
-              <span>03:00:00</span>
+              <span className="hidden sm:inline">02:15:00</span>
+              <span className="hidden md:inline">03:00:00</span>
               <span>03:42:15</span>
             </div>
 
             {/* Pin 1 */}
             <div
               onClick={() => onOpenInEditor(DASHBOARD_PROJECT_CARDS[1])}
-              className="absolute top-2 left-[7%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-20"
+              className="absolute top-2 left-[12%] sm:left-[7%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-20"
             >
-              <div className="px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-sm text-label-sm font-mono flex items-center gap-1 shadow-md">
+              <div className="px-1.5 sm:px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-sm text-[10px] sm:text-label-sm font-mono flex items-center gap-1 shadow-md whitespace-nowrap">
                 <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
                 <span>Score 92</span>
               </div>
@@ -295,7 +295,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => onOpenInEditor(DASHBOARD_PROJECT_CARDS[0])}
               className="absolute top-2 left-[46%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-30"
             >
-              <div className="px-2 py-0.5 rounded bg-secondary text-on-secondary font-label-sm text-label-sm font-mono font-bold flex items-center gap-1 shadow-lg">
+              <div className="px-1.5 sm:px-2 py-0.5 rounded bg-secondary text-on-secondary font-label-sm text-[10px] sm:text-label-sm font-mono font-bold flex items-center gap-1 shadow-lg whitespace-nowrap">
                 <span className="material-symbols-outlined text-[12px]">
                   local_fire_department
                 </span>
@@ -308,9 +308,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* Pin 3 */}
             <div
               onClick={() => onOpenInEditor(DASHBOARD_PROJECT_CARDS[2])}
-              className="absolute top-2 left-[58%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-20"
+              className="hidden sm:flex absolute top-2 left-[58%] -translate-x-1/2 flex-col items-center cursor-pointer z-20"
             >
-              <div className="px-2 py-0.5 rounded bg-surface-container-high text-tertiary font-label-sm text-label-sm font-mono flex items-center gap-1 shadow-md">
+              <div className="px-2 py-0.5 rounded bg-surface-container-high text-tertiary font-label-sm text-label-sm font-mono flex items-center gap-1 shadow-md whitespace-nowrap">
                 <span>Score 88</span>
               </div>
               <div className="w-0.5 h-12 bg-tertiary/80" />
@@ -320,11 +320,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {/* Pin 4 */}
             <div
               onClick={() => onOpenInEditor(DASHBOARD_PROJECT_CARDS[3])}
-              className="absolute top-2 left-[74%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-20"
+              className="absolute top-2 left-[80%] sm:left-[74%] -translate-x-1/2 flex flex-col items-center cursor-pointer z-20"
             >
-              <div className="px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-label-sm text-label-sm font-mono font-bold flex items-center gap-1 shadow-md">
+              <div className="px-1.5 sm:px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-label-sm text-[10px] sm:text-label-sm font-mono font-bold flex items-center gap-1 shadow-md whitespace-nowrap">
                 <span className="material-symbols-outlined text-[12px]">bolt</span>
-                <span>Score 95 Viral</span>
+                <span>Score 95</span>
               </div>
               <div className="w-0.5 h-12 bg-primary" />
               <div className="w-2 h-2 rounded-full bg-primary -mt-1" />

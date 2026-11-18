@@ -64,6 +64,10 @@ export default function App() {
   const [activeTransition, setActiveTransition] = useState<'fade' | 'zoom' | 'slide'>('zoom');
 
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+  const [mobileEditorPane, setMobileEditorPane] = useState<'stage' | 'inspector' | 'tools'>(
+    'stage'
+  );
 
   const commitProjectChange = useCallback(
     (updater: (prev: ProjectState) => ProjectState) => {
@@ -399,20 +403,41 @@ export default function App() {
   ];
 
   return (
-    <div className="bg-surface text-on-surface font-body-md text-body-md min-h-screen">
-      {/* Fixed Left Sidebar (Exact match to code_a5f5c0ca.html & code_1c2fef5e.html) */}
+    <div className="bg-surface text-on-surface font-body-md text-body-md min-h-screen overflow-x-hidden">
+      {/* Mobile Sidebar Backdrop Scrim */}
+      {isMobileSidebarOpen && (
+        <div
+          onClick={() => setIsMobileSidebarOpen(false)}
+          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 lg:hidden"
+        />
+      )}
+
+      {/* Left Sidebar (Fixed on Desktop lg:w-64, Slide-over Drawer on Mobile) */}
       <aside
         aria-label="ClipForge Primary Sidebar"
-        className="fixed left-0 top-0 h-full w-64 bg-surface-container-low z-50 flex flex-col justify-between py-space-md select-none"
+        className={`fixed left-0 top-0 h-full w-64 bg-surface-container-low z-50 flex flex-col justify-between py-space-md select-none transition-transform duration-200 ${
+          isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
       >
         <div className="flex flex-col gap-space-md">
-          <div className="px-space-md">
+          <div className="px-space-md flex items-center justify-between">
             <button
               type="button"
-              onClick={() => setActiveScreen('editor')}
+              onClick={() => {
+                setActiveScreen('editor');
+                setIsMobileSidebarOpen(false);
+              }}
               className="cursor-pointer focus:outline-none"
             >
               <ClipForgeLogoMark />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsMobileSidebarOpen(false)}
+              aria-label="Close navigation menu"
+              className="lg:hidden p-1 rounded-lg text-on-surface-variant hover:text-on-surface cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
 
@@ -432,7 +457,10 @@ export default function App() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setActiveScreen(item.id)}
+                  onClick={() => {
+                    setActiveScreen(item.id);
+                    setIsMobileSidebarOpen(false);
+                  }}
                   className={`flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors text-left cursor-pointer ${
                     isActive
                       ? 'bg-surface-container-high text-on-surface font-title-md text-title-md'
@@ -482,11 +510,32 @@ export default function App() {
         </div>
       </aside>
 
-      {/* Main Content Container offset by w-64 sidebar */}
-      <div className="pl-64">
-        {/* Fixed Top Header (`h-16 bg-surface/85 backdrop-blur-xl` matching code_a5f5c0ca.html) */}
-        <header className="fixed top-0 left-64 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.2)] z-40 flex items-center justify-between px-space-md md:px-margin-desktop select-none">
-          <nav className="flex items-center gap-space-xs">
+      {/* Main Content Container offset by w-64 sidebar on desktop */}
+      <div className="pl-0 lg:pl-64 pb-14 lg:pb-0">
+        {/* Fixed Top Header (`h-14 sm:h-16 bg-surface/85 backdrop-blur-xl` matching code_a5f5c0ca.html) */}
+        <header className="fixed top-0 left-0 lg:left-64 right-0 h-14 lg:h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.2)] z-40 flex items-center justify-between px-3 sm:px-space-md md:px-margin-desktop select-none">
+          {/* Mobile Left Logo + Hamburger */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              type="button"
+              data-testid="mobile-menu-trigger"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              aria-label="Open navigation menu"
+              className="p-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[20px]">menu</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveScreen('editor')}
+              className="cursor-pointer focus:outline-none"
+            >
+              <ClipForgeLogoMark />
+            </button>
+          </div>
+
+          {/* Desktop Navigation Tabs */}
+          <nav className="hidden lg:flex items-center gap-space-xs">
             {topHeaderOrder.map((tab) => {
               const isActive = activeScreen === tab.id;
               return (
@@ -506,7 +555,7 @@ export default function App() {
             })}
           </nav>
 
-          <div className="flex items-center gap-space-md">
+          <div className="flex items-center gap-2 sm:gap-space-md">
             <div className="hidden sm:flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-surface-container-high">
               <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
               <span className="font-label-sm text-label-sm text-secondary tracking-wide uppercase">
@@ -514,12 +563,12 @@ export default function App() {
               </span>
             </div>
 
-            <div className="px-space-sm py-space-xs rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold uppercase tracking-wider inline-flex items-center gap-space-xs">
-              <span className="material-symbols-outlined text-[14px]">bolt</span>
-              Pro Trial
+            <div className="px-2.5 sm:px-space-sm py-1 sm:py-space-xs rounded-full bg-secondary-container text-on-secondary-container font-label-md text-[10px] sm:text-label-md font-bold uppercase tracking-wider inline-flex items-center gap-1">
+              <span className="material-symbols-outlined text-[13px] sm:text-[14px]">bolt</span>
+              <span>Pro Trial</span>
             </div>
 
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-on-primary text-[18px]">
                 person
               </span>
@@ -528,7 +577,7 @@ export default function App() {
         </header>
 
         {/* Active View Area */}
-        <main className="w-full pt-16 bg-surface">
+        <main className="w-full pt-14 lg:pt-16 bg-surface">
           {activeScreen === 'dashboard' ? (
             <DashboardView
               onOpenInEditor={handleOpenDashboardCardInEditor}
@@ -548,23 +597,23 @@ export default function App() {
               onOpenDashboard={() => setActiveScreen('dashboard')}
             />
           ) : (
-            <div className="flex flex-col w-full h-[calc(100vh-4rem)] overflow-hidden select-none bg-surface-container-lowest">
-              {/* Top Subheader Studio Bar (Exact match to code_a5f5c0ca.html) */}
-              <div className="h-14 bg-surface-container-low px-space-md md:px-margin-desktop flex items-center justify-between flex-shrink-0 z-30 shadow-md gap-3">
-                <div className="flex items-center gap-space-md min-w-0">
-                  <div className="flex items-center gap-space-sm shrink-0">
+            <div className="flex flex-col w-full h-[calc(100vh-7rem)] lg:h-[calc(100vh-4rem)] overflow-hidden select-none bg-surface-container-lowest">
+              {/* Top Subheader Studio Bar (Responsive on mobile + exact match to code_a5f5c0ca.html on desktop) */}
+              <div className="min-h-12 lg:h-14 py-1.5 lg:py-0 bg-surface-container-low px-2.5 sm:px-space-md md:px-margin-desktop flex items-center justify-between flex-shrink-0 z-30 shadow-md gap-2">
+                <div className="flex items-center gap-2 sm:gap-space-md min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-space-sm min-w-0">
                     <button
                       type="button"
                       onClick={() => setActiveScreen('dashboard')}
-                      className="p-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+                      className="p-1 sm:p-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer shrink-0"
                       title="Back to Dashboard"
                     >
-                      <span className="material-symbols-outlined text-[20px]">
+                      <span className="material-symbols-outlined text-[18px] sm:text-[20px]">
                         arrow_back
                       </span>
                     </button>
-                    <div className="flex flex-col shrink-0">
-                      <div className="flex items-center gap-space-xs">
+                    <div className="flex flex-col min-w-0">
+                      <div className="flex items-center gap-1 min-w-0">
                         {isEditingTitle ? (
                           <input
                             type="text"
@@ -580,25 +629,25 @@ export default function App() {
                                 title: e.target.value,
                               }))
                             }
-                            className="bg-surface-container-lowest px-2 py-0.5 rounded font-headline-md text-title-md text-on-surface focus:outline-none ring-1 ring-primary"
+                            className="bg-surface-container-lowest px-2 py-0.5 rounded font-headline-md text-body-sm sm:text-title-md text-on-surface focus:outline-none ring-1 ring-primary w-40 sm:w-auto"
                           />
                         ) : (
                           <>
-                            <span className="font-headline-md text-title-md text-on-surface font-semibold whitespace-nowrap">
+                            <span className="font-headline-md text-body-sm sm:text-title-md text-on-surface font-semibold truncate lg:whitespace-nowrap">
                               {project.title}
                             </span>
                             <button
                               type="button"
                               onClick={() => setIsEditingTitle(true)}
                               aria-label="Edit project title"
-                              className="material-symbols-outlined text-[16px] text-on-surface-variant cursor-pointer hover:text-primary"
+                              className="material-symbols-outlined text-[15px] sm:text-[16px] text-on-surface-variant cursor-pointer hover:text-primary shrink-0"
                             >
                               edit
                             </button>
                           </>
                         )}
                       </div>
-                      <span className="font-label-sm text-label-sm text-outline whitespace-nowrap">
+                      <span className="hidden sm:inline font-label-sm text-label-sm text-outline truncate">
                         Source: lex_fridman_ep418_raw_4k.mov
                       </span>
                     </div>
@@ -637,13 +686,16 @@ export default function App() {
                 </div>
 
                 {/* Center/Right Controls */}
-                <div className="flex items-center gap-space-sm shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-space-sm shrink-0">
                   {/* Rights Check Warning Indicator when source is external */}
                   {rightsState.requiresWarningBanner && (
                     <button
                       type="button"
                       data-testid="global-rights-warning-bar"
-                      onClick={() => setRightTab('reframe')}
+                      onClick={() => {
+                        setRightTab('reframe');
+                        setMobileEditorPane('inspector');
+                      }}
                       title="Rights Check: External Source Attribution Active"
                       className="hidden lg:flex items-center gap-1 bg-secondary-container/15 hover:bg-secondary-container/25 text-secondary px-2.5 py-1 rounded-lg font-label-sm text-label-sm cursor-pointer"
                     >
@@ -658,7 +710,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setAutoReframeActive((v) => !v)}
-                    className="flex items-center gap-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface px-space-sm py-space-xs rounded-lg transition-colors cursor-pointer"
+                    className="hidden md:flex items-center gap-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface px-space-sm py-space-xs rounded-lg transition-colors cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[16px] text-primary">
                       face_retouching_natural
@@ -681,190 +733,294 @@ export default function App() {
                     data-testid="subheader-quick-download-mp4"
                     onClick={handleQuickDownloadShortMp4}
                     title="1-Click Download Rendered Short (.MP4)"
-                    className="flex items-center gap-1.5 bg-secondary/20 hover:bg-secondary/30 text-secondary px-space-sm py-space-xs rounded-lg font-title-md text-body-sm font-semibold transition-colors cursor-pointer"
+                    className="flex items-center gap-1 bg-secondary/20 hover:bg-secondary/30 text-secondary px-2.5 sm:px-space-sm py-1.5 sm:py-space-xs rounded-lg font-title-md text-[12px] sm:text-body-sm font-semibold transition-colors cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[17px]">download</span>
-                    <span>Download .MP4</span>
+                    <span className="material-symbols-outlined text-[16px] sm:text-[17px]">
+                      download
+                    </span>
+                    <span className="hidden sm:inline">Download .MP4</span>
+                    <span className="inline sm:hidden">.MP4</span>
                   </button>
 
                   {/* Render & Export Short CTA */}
                   <button
                     type="button"
                     onClick={() => setIsExportModalOpen(true)}
-                    className="relative group flex items-center gap-space-xs bg-primary hover:bg-primary-fixed-dim text-on-primary px-space-md py-space-xs rounded-lg transition-all duration-200 shadow-[0_0_24px_rgba(202,190,255,0.35)] hover:shadow-[0_0_32px_rgba(202,190,255,0.55)] cursor-pointer"
+                    className="relative group flex items-center gap-1 sm:gap-space-xs bg-primary hover:bg-primary-fixed-dim text-on-primary px-2.5 sm:px-space-md py-1.5 sm:py-space-xs rounded-lg transition-all duration-200 shadow-[0_0_24px_rgba(202,190,255,0.35)] hover:shadow-[0_0_32px_rgba(202,190,255,0.55)] cursor-pointer"
                   >
-                    <span className="material-symbols-outlined text-[18px]">bolt</span>
-                    <span className="font-title-md text-title-md font-semibold text-on-primary">
-                      Render &amp; Export Short
+                    <span className="material-symbols-outlined text-[16px] sm:text-[18px]">
+                      bolt
                     </span>
-                    <span className="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-0.5">
+                    <span className="font-title-md text-[12px] sm:text-title-md font-semibold text-on-primary">
+                      <span className="hidden sm:inline">Render &amp; Export Short</span>
+                      <span className="inline sm:hidden">Export</span>
+                    </span>
+                    <span className="hidden sm:inline material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-0.5">
                       arrow_forward
                     </span>
                   </button>
                 </div>
               </div>
 
+              {/* Mobile Studio Workspace Switcher (< lg only) */}
+              <div
+                data-testid="mobile-editor-pane-switcher"
+                className="lg:hidden flex items-center bg-surface-container p-1 gap-1 px-2 border-b border-outline-variant/20 shrink-0"
+              >
+                {(
+                  [
+                    { id: 'stage', label: 'Stage & Timeline', icon: 'smart_display' },
+                    { id: 'inspector', label: 'Captions & Mix', icon: 'tune' },
+                    { id: 'tools', label: 'Tools & Mic', icon: 'mic' },
+                  ] as const
+                ).map((pane) => {
+                  const active = mobileEditorPane === pane.id;
+                  return (
+                    <button
+                      key={pane.id}
+                      type="button"
+                      onClick={() => {
+                        setMobileEditorPane(pane.id);
+                        if (pane.id === 'tools' && !drawerOpen) {
+                          setLeftTab('commentary');
+                          setDrawerOpen(true);
+                        }
+                      }}
+                      className={`flex-1 min-w-0 py-1.5 px-1.5 rounded-lg font-title-md text-[11px] sm:text-[12px] flex items-center justify-center gap-1 transition-colors cursor-pointer ${
+                        active
+                          ? 'bg-primary text-on-primary font-bold shadow-sm'
+                          : 'text-on-surface-variant hover:text-on-surface'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[14px] shrink-0">
+                        {pane.icon}
+                      </span>
+                      <span className="truncate">{pane.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* Studio Stage & Multi-Panels (Fixed Vertical Body) */}
               <div className="flex-1 flex overflow-hidden relative min-h-0">
-                <LeftToolDock
-                  activeTab={leftTab}
-                  drawerOpen={drawerOpen}
-                  onSelectRailTab={handleSelectRailTab}
-                  onCloseDrawer={() => setDrawerOpen(false)}
-                  onSplitAtPlayhead={handleSplitAtPlayhead}
+                {/* Left Tool Dock: Always visible on Desktop lg:, visible on Mobile when 'tools' selected */}
+                <div
+                  className={`${
+                    mobileEditorPane === 'tools' ? 'flex w-full' : 'hidden'
+                  } lg:flex lg:w-auto h-full`}
+                >
+                  <LeftToolDock
+                    activeTab={leftTab}
+                    drawerOpen={drawerOpen}
+                    onSelectRailTab={handleSelectRailTab}
+                    onCloseDrawer={() => setDrawerOpen(false)}
+                    onSplitAtPlayhead={handleSplitAtPlayhead}
+                    project={project}
+                    playheadTime={playheadTime}
+                    selectedClipId={selectedClipId}
+                    onAddClip={handleAddClip}
+                    onUpdateClip={handleUpdateClip}
+                    onApplyStylePreset={handleApplyStylePreset}
+                    onUpdateCommentaryConfig={(patch) =>
+                      commitProjectChange((prev) => ({
+                        ...prev,
+                        commentary: { ...prev.commentary, ...patch },
+                      }))
+                    }
+                    onInsertFreezeFrame={handleInsertFreezeFrame}
+                    onSaveProjectToServer={handleSaveProjectToServer}
+                    onLoadProjectState={(loaded) => setHistory(createHistoryStack(loaded))}
+                  />
+                </div>
+
+                {/* Center Preview Monitor: Always visible on Desktop lg:, visible on Mobile when 'stage' selected */}
+                <div
+                  className={`${
+                    mobileEditorPane === 'stage' ? 'flex' : 'hidden'
+                  } lg:flex flex-1 min-w-0 h-full`}
+                >
+                  <PreviewMonitor
+                    project={project}
+                    playheadTime={playheadTime}
+                    isPlaying={isPlaying}
+                    loopPlayback={loopPlayback}
+                    selectedClipId={selectedClipId}
+                    activeCaptionPresetId={activeCaptionPresetId}
+                    activeTransition={activeTransition}
+                    autoReframeActive={autoReframeActive}
+                    onTogglePlay={() => setIsPlaying((p) => !p)}
+                    onToggleLoop={() => setLoopPlayback((l) => !l)}
+                    onSeek={(t) => setPlayheadTime(clamp(t, 0, project.duration))}
+                    onStepFrames={(delta) =>
+                      setPlayheadTime((t) =>
+                        stepFrame(t, delta, project.fps, project.duration)
+                      )
+                    }
+                    onChangeAspectRatio={(ratio) =>
+                      commitProjectChange((prev) => ({ ...prev, aspectRatio: ratio }))
+                    }
+                    onUpdateClipTransform={handleUpsertKeyframeAtPlayhead}
+                    onTriggerZoomHighlight={handleTriggerZoomHighlight}
+                    onTriggerFreezeFrame={() =>
+                      handleInsertFreezeFrame(
+                        'Compute scaling inflection point — 4x retention spike',
+                        'callout-box'
+                      )
+                    }
+                    onChangeCommentaryLayout={(layoutMode) =>
+                      commitProjectChange((prev) => ({
+                        ...prev,
+                        commentary: { ...prev.commentary, layoutMode },
+                      }))
+                    }
+                    onOpenExportModal={() => setIsExportModalOpen(true)}
+                    onQuickDownloadMp4={handleQuickDownloadShortMp4}
+                  />
+                </div>
+
+                {/* Right Inspector: Always visible on Desktop lg:, visible on Mobile when 'inspector' selected */}
+                <div
+                  className={`${
+                    mobileEditorPane === 'inspector' ? 'flex w-full' : 'hidden'
+                  } lg:flex lg:w-auto h-full`}
+                >
+                  <RightInspector
+                    activeTab={rightTab}
+                    onChangeTab={setRightTab}
+                    project={project}
+                    playheadTime={playheadTime}
+                    selectedClipId={selectedClipId}
+                    activeCaptionPresetId={activeCaptionPresetId}
+                    activeTransition={activeTransition}
+                    onSelectCaptionPreset={handleSelectCaptionPreset}
+                    onSelectTransition={setActiveTransition}
+                    onUpdateClip={handleUpdateClip}
+                    onApplyClipSpeed={handleApplyClipSpeed}
+                    onUpsertKeyframeAtPlayhead={handleUpsertKeyframeAtPlayhead}
+                    onTriggerZoomHighlight={handleTriggerZoomHighlight}
+                    onUpdateTrackMixer={(trackId: TrackId, patch) =>
+                      commitProjectChange((prev) => ({
+                        ...prev,
+                        mixer: {
+                          ...prev.mixer,
+                          [trackId]: { ...prev.mixer[trackId], ...patch },
+                        },
+                      }))
+                    }
+                    onUpdateRights={(patch) =>
+                      commitProjectChange((prev) => ({
+                        ...prev,
+                        rights: { ...prev.rights, ...patch },
+                      }))
+                    }
+                    onUpdateBaseDescription={(baseDescription) =>
+                      commitProjectChange((prev) => ({
+                        ...prev,
+                        baseDescription,
+                      }))
+                    }
+                    onChangeCommentaryLayout={(layoutMode) =>
+                      commitProjectChange((prev) => ({
+                        ...prev,
+                        commentary: { ...prev.commentary, layoutMode },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Bottom Multi-Track Timeline Studio (Docked on Desktop & Mobile Stage View) */}
+              <div
+                className={`${
+                  mobileEditorPane === 'stage' ? 'block' : 'hidden'
+                } lg:block shrink-0`}
+              >
+                <MultiTrackTimeline
                   project={project}
                   playheadTime={playheadTime}
                   selectedClipId={selectedClipId}
-                  onAddClip={handleAddClip}
-                  onUpdateClip={handleUpdateClip}
-                  onApplyStylePreset={handleApplyStylePreset}
-                  onUpdateCommentaryConfig={(patch) =>
+                  snapEnabled={snapEnabled}
+                  pixelsPerSecond={pixelsPerSecond}
+                  canUndo={history.past.length > 0}
+                  canRedo={history.future.length > 0}
+                  onSelectClip={handleSelectClip}
+                  onSeek={(t) => setPlayheadTime(clamp(t, 0, project.duration))}
+                  onSplitAtPlayhead={handleSplitAtPlayhead}
+                  onDeleteSelected={handleDeleteSelected}
+                  onReorderSelected={handleReorderSelected}
+                  onTrimSelected={handleTrimSelected}
+                  onToggleSnap={() => setSnapEnabled((s) => !s)}
+                  onChangeZoom={setPixelsPerSecond}
+                  onUndo={() => setHistory((s) => undoHistory(s))}
+                  onRedo={() => setHistory((s) => redoHistory(s))}
+                  onToggleTrackMute={(trackId: TrackId) =>
                     commitProjectChange((prev) => ({
                       ...prev,
-                      commentary: { ...prev.commentary, ...patch },
+                      mixer: {
+                        ...prev.mixer,
+                        [trackId]: {
+                          ...prev.mixer[trackId],
+                          muted: !prev.mixer[trackId].muted,
+                        },
+                      },
                     }))
                   }
-                  onInsertFreezeFrame={handleInsertFreezeFrame}
-                  onSaveProjectToServer={handleSaveProjectToServer}
-                  onLoadProjectState={(loaded) => setHistory(createHistoryStack(loaded))}
-                />
-
-                <PreviewMonitor
-                  project={project}
-                  playheadTime={playheadTime}
-                  isPlaying={isPlaying}
-                  loopPlayback={loopPlayback}
-                  selectedClipId={selectedClipId}
-                  activeCaptionPresetId={activeCaptionPresetId}
-                  activeTransition={activeTransition}
-                  autoReframeActive={autoReframeActive}
-                  onTogglePlay={() => setIsPlaying((p) => !p)}
-                  onToggleLoop={() => setLoopPlayback((l) => !l)}
-                  onSeek={(t) => setPlayheadTime(clamp(t, 0, project.duration))}
-                  onStepFrames={(delta) =>
-                    setPlayheadTime((t) =>
-                      stepFrame(t, delta, project.fps, project.duration)
-                    )
+                  onToggleTrackSolo={(trackId: TrackId) =>
+                    commitProjectChange((prev) => ({
+                      ...prev,
+                      mixer: {
+                        ...prev.mixer,
+                        [trackId]: {
+                          ...prev.mixer[trackId],
+                          solo: !prev.mixer[trackId].solo,
+                        },
+                      },
+                    }))
                   }
-                  onChangeAspectRatio={(ratio) =>
-                    commitProjectChange((prev) => ({ ...prev, aspectRatio: ratio }))
-                  }
-                  onUpdateClipTransform={handleUpsertKeyframeAtPlayhead}
-                  onTriggerZoomHighlight={handleTriggerZoomHighlight}
                   onTriggerFreezeFrame={() =>
                     handleInsertFreezeFrame(
                       'Compute scaling inflection point — 4x retention spike',
                       'callout-box'
                     )
                   }
-                  onChangeCommentaryLayout={(layoutMode) =>
-                    commitProjectChange((prev) => ({
-                      ...prev,
-                      commentary: { ...prev.commentary, layoutMode },
-                    }))
-                  }
-                  onOpenExportModal={() => setIsExportModalOpen(true)}
-                  onQuickDownloadMp4={handleQuickDownloadShortMp4}
-                />
-
-                <RightInspector
-                  activeTab={rightTab}
-                  onChangeTab={setRightTab}
-                  project={project}
-                  playheadTime={playheadTime}
-                  selectedClipId={selectedClipId}
-                  activeCaptionPresetId={activeCaptionPresetId}
-                  activeTransition={activeTransition}
-                  onSelectCaptionPreset={handleSelectCaptionPreset}
-                  onSelectTransition={setActiveTransition}
-                  onUpdateClip={handleUpdateClip}
-                  onApplyClipSpeed={handleApplyClipSpeed}
-                  onUpsertKeyframeAtPlayhead={handleUpsertKeyframeAtPlayhead}
-                  onTriggerZoomHighlight={handleTriggerZoomHighlight}
-                  onUpdateTrackMixer={(trackId: TrackId, patch) =>
-                    commitProjectChange((prev) => ({
-                      ...prev,
-                      mixer: {
-                        ...prev.mixer,
-                        [trackId]: { ...prev.mixer[trackId], ...patch },
-                      },
-                    }))
-                  }
-                  onUpdateRights={(patch) =>
-                    commitProjectChange((prev) => ({
-                      ...prev,
-                      rights: { ...prev.rights, ...patch },
-                    }))
-                  }
-                  onUpdateBaseDescription={(baseDescription) =>
-                    commitProjectChange((prev) => ({
-                      ...prev,
-                      baseDescription,
-                    }))
-                  }
-                  onChangeCommentaryLayout={(layoutMode) =>
-                    commitProjectChange((prev) => ({
-                      ...prev,
-                      commentary: { ...prev.commentary, layoutMode },
-                    }))
-                  }
                 />
               </div>
-
-              {/* Bottom Multi-Track Timeline Studio (Docked) */}
-              <MultiTrackTimeline
-                project={project}
-                playheadTime={playheadTime}
-                selectedClipId={selectedClipId}
-                snapEnabled={snapEnabled}
-                pixelsPerSecond={pixelsPerSecond}
-                canUndo={history.past.length > 0}
-                canRedo={history.future.length > 0}
-                onSelectClip={handleSelectClip}
-                onSeek={(t) => setPlayheadTime(clamp(t, 0, project.duration))}
-                onSplitAtPlayhead={handleSplitAtPlayhead}
-                onDeleteSelected={handleDeleteSelected}
-                onReorderSelected={handleReorderSelected}
-                onTrimSelected={handleTrimSelected}
-                onToggleSnap={() => setSnapEnabled((s) => !s)}
-                onChangeZoom={setPixelsPerSecond}
-                onUndo={() => setHistory((s) => undoHistory(s))}
-                onRedo={() => setHistory((s) => redoHistory(s))}
-                onToggleTrackMute={(trackId: TrackId) =>
-                  commitProjectChange((prev) => ({
-                    ...prev,
-                    mixer: {
-                      ...prev.mixer,
-                      [trackId]: {
-                        ...prev.mixer[trackId],
-                        muted: !prev.mixer[trackId].muted,
-                      },
-                    },
-                  }))
-                }
-                onToggleTrackSolo={(trackId: TrackId) =>
-                  commitProjectChange((prev) => ({
-                    ...prev,
-                    mixer: {
-                      ...prev.mixer,
-                      [trackId]: {
-                        ...prev.mixer[trackId],
-                        solo: !prev.mixer[trackId].solo,
-                      },
-                    },
-                  }))
-                }
-                onTriggerFreezeFrame={() =>
-                  handleInsertFreezeFrame(
-                    'Compute scaling inflection point — 4x retention spike',
-                    'callout-box'
-                  )
-                }
-              />
             </div>
           )}
         </main>
       </div>
+
+      {/* Fixed Bottom Mobile Navigation Bar (< lg only) */}
+      <nav
+        aria-label="Mobile Bottom Navigation"
+        data-testid="mobile-bottom-nav"
+        className="lg:hidden fixed bottom-0 inset-x-0 h-14 bg-surface-container-low/95 backdrop-blur-xl border-t border-outline-variant/30 z-40 flex items-center justify-around px-2 select-none"
+      >
+        {navItems.map((item) => {
+          const isActive = activeScreen === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveScreen(item.id)}
+              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-colors cursor-pointer ${
+                isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+              <span className="font-label-sm text-[10px] font-semibold mt-0.5">
+                {item.id === 'editor'
+                  ? 'Editor'
+                  : item.id === 'mobile'
+                  ? 'Companion'
+                  : item.id === 'landing'
+                  ? 'Landing'
+                  : 'Dashboard'}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
 
       {/* Server-Side FFmpeg CRF 16 Export Dialog */}
       <ExportModal

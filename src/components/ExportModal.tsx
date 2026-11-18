@@ -391,17 +391,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
         </div>
 
         {/* Footer Actions */}
-        <div className="px-5 py-3.5 bg-surface-container border-t border-outline-variant/30 flex items-center justify-between gap-4">
+        <div className="px-4 sm:px-5 py-3 bg-surface-container border-t border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
           <span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap shrink-0">
             Master Output:{' '}
             <code className="text-on-surface font-mono">CRF 16 · libx264 · AAC 256k</code>
           </span>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleRunServerRender}
               disabled={isRendering}
-              className="px-3.5 py-2 font-title-md text-body-sm bg-surface-container-high hover:bg-surface-bright disabled:opacity-50 text-on-surface rounded-xl flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 cursor-pointer"
+              className="flex-1 sm:flex-initial justify-center px-3 py-2 font-title-md text-body-sm bg-surface-container-high hover:bg-surface-bright disabled:opacity-50 text-on-surface rounded-xl flex items-center gap-1.5 transition-all whitespace-nowrap shrink-0 cursor-pointer"
             >
               <span
                 className={`material-symbols-outlined text-[16px] ${
@@ -411,14 +411,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                 {isRendering ? 'progress_activity' : 'refresh'}
               </span>
               <span>
-                {isRendering ? 'Rendering Timeline...' : 'Render Timeline Server-Side'}
+                {isRendering ? 'Rendering...' : 'Re-Render'}
               </span>
             </button>
 
             <button
               type="button"
               onClick={handleDownloadMp4}
-              className="px-4 py-2 font-title-md text-body-sm bg-primary hover:bg-primary-fixed-dim text-on-primary rounded-xl flex items-center gap-1.5 shadow-[0_0_20px_rgba(202,190,255,0.35)] transition-all whitespace-nowrap shrink-0 cursor-pointer"
+              className="flex-1 sm:flex-initial justify-center px-4 py-2 font-title-md text-body-sm bg-primary hover:bg-primary-fixed-dim text-on-primary rounded-xl flex items-center gap-1.5 shadow-[0_0_20px_rgba(202,190,255,0.35)] transition-all whitespace-nowrap shrink-0 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[17px]">download</span>
               <span>Download Short (.MP4)</span>

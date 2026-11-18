@@ -263,7 +263,7 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
   return (
     <aside
       aria-label="Studio Tool Shelf"
-      className="flex flex-shrink-0 z-20 select-none overflow-hidden"
+      className="flex flex-shrink-0 w-full lg:w-auto h-full z-20 select-none overflow-hidden"
     >
       {/* Mini Tool Shelf (Far Left Rail matching code_a5f5c0ca.html) */}
       <div className="w-14 bg-surface-container-low flex flex-col items-center py-space-sm gap-space-xs flex-shrink-0 z-20">
@@ -372,7 +372,7 @@ export const LeftToolDock: React.FC<LeftToolDockProps> = ({
 
       {/* Expandable Studio Drawer for Overlays, Commentary, CC0 Audio & Presets */}
       {drawerOpen && (
-        <div className="w-72 bg-surface-container-low border-l border-surface-container-high flex flex-col overflow-hidden shadow-2xl">
+        <div className="flex-1 min-w-0 lg:flex-initial lg:w-72 bg-surface-container-low border-l border-surface-container-high flex flex-col overflow-hidden shadow-2xl">
           <div className="h-10 px-space-md bg-surface-container-lowest flex items-center justify-between shrink-0">
             <span className="font-title-md text-body-md text-on-surface font-semibold">
               {activeTab === 'overlays'

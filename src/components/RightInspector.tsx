@@ -125,7 +125,7 @@ export const RightInspector: React.FC<RightInspectorProps> = ({
   return (
     <aside
       aria-label="Context Inspector and Rights Panel"
-      className="w-80 md:w-96 bg-surface-container-low flex flex-col flex-shrink-0 z-20 shadow-xl overflow-hidden select-none"
+      className="w-full lg:w-80 xl:w-96 h-full bg-surface-container-low flex flex-col flex-shrink-0 z-20 shadow-xl overflow-hidden select-none"
     >
       {/* Tab Header Strip (Exact match to code_a5f5c0ca.html) */}
       <div className="flex items-center bg-surface-container-lowest p-1 gap-1 shrink-0">

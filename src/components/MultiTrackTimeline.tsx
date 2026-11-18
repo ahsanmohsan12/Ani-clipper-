@@ -71,10 +71,10 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
 
   const totalTimelineWidth = Math.max(920, Math.ceil((project.duration + 3) * pixelsPerSecond));
 
-  const handleRulerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleRulerSeek = (clientX: number) => {
     if (!rulerRef.current) return;
     const rect = rulerRef.current.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
+    const clickX = clientX - rect.left;
     const targetSec = clamp(clickX / pixelsPerSecond, 0, project.duration);
     onSeek(Math.round(targetSec * project.fps) / project.fps);
   };
@@ -82,10 +82,10 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
   return (
     <section
       aria-label="Multi-Track Timeline Editor"
-      className="h-64 bg-surface-container-low flex flex-col flex-shrink-0 z-30 shadow-2xl relative select-none"
+      className="h-52 lg:h-64 bg-surface-container-low flex flex-col flex-shrink-0 z-30 shadow-2xl relative select-none"
     >
       {/* Timeline Global Toolbar (Exact match to code_a5f5c0ca.html) */}
-      <div className="h-10 bg-surface-container px-space-md flex items-center justify-between flex-shrink-0 gap-2 overflow-x-auto">
+      <div className="h-10 bg-surface-container px-2 sm:px-space-md flex items-center justify-between flex-shrink-0 gap-2 overflow-x-auto">
         <div className="flex items-center gap-space-sm">
           {/* Track Quick Actions */}
           <div className="flex items-center gap-1">
@@ -268,10 +268,10 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
 
       {/* Timeline Workspace (Tracks Pane + Sequencer Canvas) */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left Track Header Labels Rail (`w-48 bg-surface-container-low`) */}
-        <div className="w-48 bg-surface-container-low flex flex-col flex-shrink-0 shadow-sm z-20">
+        {/* Left Track Header Labels Rail (`w-28 sm:w-40 lg:w-48 bg-surface-container-low`) */}
+        <div className="w-28 sm:w-40 lg:w-48 bg-surface-container-low flex flex-col flex-shrink-0 shadow-sm z-20">
           {/* Top spacer aligning with 24px Ruler */}
-          <div className="h-6 px-space-sm flex items-center justify-between text-[10px] font-label-sm text-outline bg-surface-container-lowest/60">
+          <div className="h-6 px-1.5 sm:px-space-sm flex items-center justify-between text-[9px] sm:text-[10px] font-label-sm text-outline bg-surface-container-lowest/60">
             <span>TRACKS</span>
             <span>{project.clips.length} CLIPS</span>
           </div>
@@ -282,20 +282,20 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
               return (
                 <div
                   key={track.id}
-                  className="h-[31px] px-space-sm flex items-center justify-between bg-surface-container-low hover:bg-surface-container/60 transition-colors"
+                  className="h-[26px] lg:h-[31px] px-1.5 sm:px-space-sm flex items-center justify-between bg-surface-container-low hover:bg-surface-container/60 transition-colors"
                 >
-                  <div className="flex items-center gap-space-xs min-w-0">
+                  <div className="flex items-center gap-1 sm:gap-space-xs min-w-0">
                     <span
-                      className={`material-symbols-outlined text-[16px] ${track.iconColorClass}`}
+                      className={`material-symbols-outlined text-[14px] sm:text-[16px] ${track.iconColorClass}`}
                     >
                       {track.icon}
                     </span>
-                    <span className="font-title-md text-body-sm text-on-surface font-semibold truncate">
+                    <span className="font-title-md text-[11px] sm:text-body-sm text-on-surface font-semibold truncate">
                       {track.label}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
                     <button
                       type="button"
                       onClick={() => onToggleTrackMute(track.id)}
@@ -306,7 +306,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
                           : 'text-on-surface-variant hover:text-on-surface'
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[14px]">
+                      <span className="material-symbols-outlined text-[13px] sm:text-[14px]">
                         {mixerState.muted ? 'volume_off' : 'volume_up'}
                       </span>
                     </button>
@@ -314,7 +314,7 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
                       type="button"
                       onClick={() => onToggleTrackSolo(track.id)}
                       aria-label={`Solo ${track.label} track`}
-                      className={`px-1 rounded font-label-sm text-[10px] cursor-pointer ${
+                      className={`px-1 rounded font-label-sm text-[9px] sm:text-[10px] cursor-pointer ${
                         mixerState.solo
                           ? 'bg-secondary text-on-secondary font-bold'
                           : 'text-on-surface-variant hover:text-on-surface'
@@ -335,7 +335,10 @@ export const MultiTrackTimeline: React.FC<MultiTrackTimelineProps> = ({
             {/* Ruler Time Tick Marks Bar */}
             <div
               ref={rulerRef}
-              onClick={handleRulerClick}
+              onClick={(e) => handleRulerSeek(e.clientX)}
+              onTouchMove={(e) => {
+                if (e.touches[0]) handleRulerSeek(e.touches[0].clientX);
+              }}
               className="h-6 bg-surface-container-lowest flex items-center relative text-[10px] font-label-sm text-outline select-none cursor-pointer"
             >
               {Array.from({ length: Math.ceil(project.duration + 3) }).map((_, sec) => {
