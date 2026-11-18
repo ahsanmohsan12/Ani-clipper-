@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipForge — Design System & UI Presentation Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#0B0B0F',
+              card: '#15151C',
+              cardAlt: '#1B1B24',
+              border: '#262635',
+              borderLight: '#323246',
+              accent: '#7C5CFF',
+              accentHover: '#6948ED',
+              accentGlow: 'rgba(124, 92, 255, 0.25)',
+              yellow: '#FACC15',
+              green: '#10B981',
+              pink: '#EC4899',
+              cyan: '#06B6D4'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #07070A;
+      color: #E2E8F0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #2D2D3E;
+      border-radius: 4px;
+    }
+    .glow-accent {
+      box-shadow: 0 0 35px -5px rgba(124, 92, 255, 0.35);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.3);
+    }
+    .waveform-bar {
+      transition: height 0.2s ease;
+    }
+    .dot-pattern {
+      background-image: radial-gradient(#262638 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 lg:p-12 min-h-screen bg-[#07070A] dot-pattern selection:bg-[#7C5CFF] selection:text-white">
+
+  <!-- Master Canvas Board: 16:9 Presentation Frame -->
+  <div class="max-w-[1720px] mx-auto bg-[#0B0B0F] border border-[#232332] rounded-[32px] p-6 lg:p-10 shadow-2xl relative overflow-hidden">
+    
+    <!-- Ambient Background Glows -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-[#7C5CFF]/15 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-[#06B6D4]/10 rounded-full blur-[140px] pointer-events-none"></div>
+    <div class="absolute -bottom-32 left-1/3 w-[500px] h-96 bg-[#7C5CFF]/10 rounded-full blur-[150px] pointer-events-none"></div>
+
+    <!-- Presentation Header -->
+    <header class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-[#1E1E2C] mb-10">
+      <div class="flex items-center gap-4">
+        <!-- Logo -->
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#7C5CFF] to-[#A78BFA] flex items-center justify-center shadow-lg shadow-[#7C5CFF]/30">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl lg:text-3xl font-extrabold tracking-tight text-white">ClipForge <span class="text-[#7C5CFF] text-xl font-mono font-medium">UI Suite</span></h1>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#7C5CFF]/20 text-[#A78BFA] border border-[#7C5CFF]/30">v2.4 Production Design</span>
+          </div>
+          <p class="text-sm text-slate-400 mt-1">Autonomous AI Video-to-Shorts Engine • Cross-Platform Ecosystem Master Board</p>
+        </div>
+      </div>
+
+      <!-- Specs & Metadata Chips -->
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#15151C] border border-[#262635] text-xs text-slate-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#0B0B0F] border border-slate-600 inline-block"></span>
+          <span>Bg: <span class="font-mono text-slate-400">#0B0B0F</span></span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#15151C] border border-[#262635] text-xs text-slate-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#15151C] border border-slate-500 inline-block"></span>
+          <span>Cards: <span class="font-mono text-slate-400">#15151C</span></span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#15151C] border border-[#262635] text-xs text-slate-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#7C5CFF] inline-block shadow-sm shadow-[#7C5CFF]"></span>
+          <span>Accent: <span class="font-mono text-[#A78BFA]">#7C5CFF</span></span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#15151C] border border-[#262635] text-xs text-slate-300">
+          <span class="text-xs text-emerald-400">● 99.4% Virality AI Score</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN GRID CANVAS: 2 Major Columns Layout (SaaS Web App + Landing & Mobile) -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 relative z-10">
+
+      <!-- ========================================== -->
+      <!-- LEFT SECTION: COMPONENT 1 - DESKTOP DASHBOARD (7 Cols) -->
+      <!-- ========================================== -->
+      <div class="xl:col-span-7 flex flex-col gap-8">
+        
+        <!-- Section Header Label -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="flex items-center justify-center w-6 h-6 rounded-md bg-[#7C5CFF] text-white text-xs font-bold font-mono">01</span>
+            <h2 class="text-lg font-bold text-white tracking-wide">Desktop Dashboard & AI Moment Extractor</h2>
+          </div>
+          <span class="text-xs text-slate-400 font-mono">1440 × 900 Viewport • Scaled Interactive Preview</span>
+        </div>
+
+        <!-- Dashboard App Window Frame -->
+        <div class="bg-[#15151C] border border-[#262635] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+          <!-- Window Title Bar -->
+          <div class="bg-[#111117] px-4 py-3 border-b border-[#21212E] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#FF5F56]/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-[#FFBD2E]/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-[#27C93F]/80 inline-block"></span>
+              <span class="ml-2 text-xs font-mono text-slate-400">app.clipforge.ai/dashboard/stream-session-984</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-slate-400">
+              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium text-[11px]">● Live Sync Active</span>
+              <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center text-[10px] text-white font-bold">JD</div>
+            </div>
+          </div>
+
+          <!-- Dashboard Inner UI (Sidebar + Main Content) -->
+          <div class="flex flex-1 min-h-[580px]">
+            <!-- Dashboard Sidebar -->
+            <aside class="w-48 bg-[#111117] border-r border-[#21212E] p-3 flex flex-col justify-between shrink-0">
+              <div class="space-y-6">
+                <!-- Mini Brand -->
+                <div class="flex items-center gap-2 px-2 py-1">
+                  <div class="w-6 h-6 rounded-lg bg-[#7C5CFF] flex items-center justify-center text-white text-xs font-bold">CF</div>
+                  <span class="font-bold text-sm text-white">ClipForge</span>
+                </div>
+
+                <!-- Navigation List -->
+                <nav class="space-y-1">
+                  <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#1E1E2C] transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                    <span>Projects</span>
+                  </a>
+                  <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-white bg-[#7C5CFF]/15 text-[#A78BFA] border border-[#7C5CFF]/30 transition">
+                    <svg class="w-4 h-4 text-[#7C5CFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <span>Moments</span>
+                    <span class="ml-auto px-1.5 py-0.2 rounded-full bg-[#7C5CFF] text-[10px] text-white">8</span>
+                  </a>
+                  <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#1E1E2C] transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    <span>Editor</span>
+                  </a>
+                  <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-[#1E1E2C] transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <span>Exports</span>
+                  </a>
+                </nav>
+              </div>
+
+              <!-- Storage & Plan Card -->
+              <div class="p-2.5 rounded-xl bg-[#1A1A24] border border-[#262638] text-[11px] space-y-1.5">
+                <div class="flex justify-between text-slate-400 font-medium">
+                  <span>AI Rendering</span>
+                  <span class="text-white font-mono">142/200m</span>
+                </div>
+                <div class="w-full bg-[#111117] h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-[#7C5CFF] to-cyan-400 h-full w-[71%]"></div>
+                </div>
+                <p class="text-[10px] text-slate-400 pt-1">Pro Team Plan • Auto AI Boost</p>
+              </div>
+            </aside>
+
+            <!-- Dashboard Main Area -->
+            <main class="flex-1 p-5 overflow-hidden flex flex-col gap-4 bg-[#0E0E14]">
+              
+              <!-- Source Ingestion Bar & Actions -->
+              <div class="bg-[#15151C] border border-[#262635] p-3 rounded-xl flex flex-wrap items-center justify-between gap-3">
+                <!-- Source Tabs -->
+                <div class="flex items-center bg-[#0B0B0F] p-1 rounded-lg border border-[#242434]">
+                  <button class="px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white">URL Source</button>
+                  <button class="px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white">Upload File</button>
+                  <button class="px-3 py-1 rounded-md text-xs font-semibold bg-[#7C5CFF] text-white shadow-sm flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                    Live Stream
+                  </button>
+                </div>
+
+                <!-- Input Stream URL -->
+                <div class="flex items-center gap-2 flex-1 max-w-sm">
+                  <div class="relative w-full">
+                    <input type="text" value="youtube.com/live/lex-fridman-sam-altman-3h40m" class="w-full bg-[#0B0B0F] border border-[#2A2A3C] rounded-lg px-3 py-1.5 text-xs text-slate-300 font-mono focus:outline-none focus:border-[#7C5CFF]" readonly>
+                  </div>
+                </div>
+
+                <!-- Find Moments CTA Button -->
+                <button class="px-4 py-1.5 bg-gradient-to-r from-[#7C5CFF] to-[#6948ED] hover:from-[#896CFF] hover:to-[#7C5CFF] text-white text-xs font-bold rounded-lg shadow-lg shadow-[#7C5CFF]/30 flex items-center gap-2 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  <span>Find Moments</span>
+                </button>
+              </div>
+
+              <!-- Stream Timeline Scrubber with Highlighted Moment Zones -->
+              <div class="bg-[#15151C] border border-[#262635] p-3.5 rounded-xl space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="text-white font-semibold">Live Stream Timeline Analysis</span>
+                    <span class="text-[11px] text-slate-400">Total: 03:42:15 • 8 Hotzones Identified</span>
+                  </div>
+                  <div class="flex items-center gap-3 text-[11px] font-mono text-slate-400">
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#7C5CFF]"></span> High Virality (&gt;90)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Moderate (80-89)</span>
+                  </div>
+                </div>
+
+                <!-- Timeline Bar with Heatmap Peaks and Highlight Zones -->
+                <div class="relative h-12 bg-[#0B0B0F] border border-[#262635] rounded-lg overflow-hidden flex items-end px-1 pt-1">
+                  <!-- Simulated Audio/Visual Density Waves -->
+                  <div class="absolute inset-0 flex items-center justify-between px-2 opacity-30">
+                    <div class="w-full flex items-end gap-0.5 h-8">
+                      <!-- Repeated procedural waveform bars -->
+                      <span class="w-1 bg-slate-500 h-2 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-4 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-3 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-6 rounded-t"></span>
+                      <span class="w-1 bg-slate-400 h-7 rounded-t"></span>
+                      <span class="w-1 bg-[#7C5CFF] h-8 rounded-t"></span>
+                      <span class="w-1 bg-[#7C5CFF] h-8 rounded-t"></span>
+                      <span class="w-1 bg-[#7C5CFF] h-7 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-3 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-4 rounded-t"></span>
+                      <span class="w-1 bg-cyan-400 h-7 rounded-t"></span>
+                      <span class="w-1 bg-cyan-400 h-6 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-2 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-3 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-5 rounded-t"></span>
+                      <span class="w-1 bg-[#7C5CFF] h-8 rounded-t"></span>
+                      <span class="w-1 bg-[#7C5CFF] h-8 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-4 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-2 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-3 rounded-t"></span>
+                      <span class="w-1 bg-cyan-400 h-7 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-2 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-4 rounded-t"></span>
+                      <span class="w-1 bg-[#7C5CFF] h-8 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-3 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-2 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-5 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-3 rounded-t"></span>
+                      <span class="w-1 bg-cyan-400 h-6 rounded-t"></span>
+                      <span class="w-1 bg-slate-500 h-2 rounded-t"></span>
+                    </div>
+                  </div>
+
+                  <!-- Highlight Moment Zone 1 -->
+                  <div class="absolute left-[14%] w-[12%] h-full bg-[#7C5CFF]/30 border-x-2 border-[#7C5CFF] flex items-center justify-center">
+                    <span class="text-[9px] font-mono font-bold bg-[#7C5CFF] text-white px-1 rounded shadow">98</span>
+                  </div>
+
+                  <!-- Highlight Moment Zone 2 -->
+                  <div class="absolute left-[38%] w-[10%] h-full bg-cyan-500/25 border-x-2 border-cyan-400 flex items-center justify-center">
+                    <span class="text-[9px] font-mono font-bold bg-cyan-500 text-black px-1 rounded shadow">86</span>
+                  </div>
+
+                  <!-- Highlight Moment Zone 3 (Active Selection) -->
+                  <div class="absolute left-[62%] w-[14%] h-full bg-[#7C5CFF]/40 border-x-2 border-[#FACC15] flex items-center justify-center ring-2 ring-[#7C5CFF]/50">
+                    <span class="text-[9px] font-mono font-bold bg-[#FACC15] text-black px-1 rounded shadow">99 VIRAL</span>
+                  </div>
+
+                  <!-- Scrubber Playhead -->
+                  <div class="absolute left-[68%] top-0 bottom-0 w-0.5 bg-white z-20 flex flex-col items-center">
+                    <div class="w-2.5 h-2.5 bg-white rotate-45 -mt-1 shadow"></div>
+                  </div>
+                </div>
+
+                <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                  <span>00:00:00</span>
+                  <span>01:15:00</span>
+                  <span>02:30:00</span>
+                  <span>03:42:15</span>
+                </div>
+              </div>
+
+              <!-- Vertical Video Cards (Moments Grid) -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <h3 class="font-bold text-white flex items-center gap-1.5">
+                    <span>Generated AI Shorts</span>
+                    <span class="text-slate-400 font-normal">(Ready to publish)</span>
+                  </h3>
+                  <span class="text-xs text-[#7C5CFF] hover:underline cursor-pointer">Sort by: Highest Virality ↓</span>
+                </div>
+
+                <!-- 3 Vertical Video Cards -->
+                <div class="grid grid-cols-3 gap-3">
+                  
+                  <!-- Card 1: Score 99 (Viral Champion) -->
+                  <div class="bg-[#181822] border-2 border-[#7C5CFF]/70 rounded-xl p-2.5 flex flex-col gap-2.5 relative group hover:border-[#7C5CFF] transition shadow-lg shadow-[#7C5CFF]/10">
+                    <!-- Virality Badge -->
+                    <div class="flex items-center justify-between">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-[#7C5CFF] to-pink-500 text-white flex items-center gap-1 shadow-sm">
+                        🔥 99 Virality
+                      </span>
+                      <span class="text-[10px] font-mono text-slate-400">00:48</span>
+                    </div>
+
+                    <!-- 9:16 Miniature Aspect Container -->
+                    <div class="aspect-[9/14] bg-[#0E0E15] rounded-lg border border-[#272738] overflow-hidden relative flex flex-col justify-between p-2">
+                      <!-- Thumbnail Mockup Visual -->
+                      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0B0B0F]/40 to-[#0B0B0F] z-0"></div>
+                      <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                        <svg class="w-12 h-12 text-[#7C5CFF]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                      </div>
+
+                      <div class="relative z-10 flex justify-between items-start">
+                        <span class="px-1.5 py-0.5 bg-black/70 backdrop-blur rounded text-[9px] text-white font-mono">01:42:10 - 01:42:58</span>
+                      </div>
+
+                      <!-- Subtitle Preview inside Card -->
+                      <div class="relative z-10 text-center pb-1">
+                        <p class="text-[10px] font-extrabold uppercase leading-tight tracking-wide drop-shadow-md">
+                          <span class="text-white">THIS IS WHY</span><br>
+                          <span class="text-[#FACC15] bg-black/60 px-1 rounded">AI CHANGES EVERYTHING</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <!-- Meta & Actions -->
+                    <div class="space-y-1.5">
+                      <p class="text-xs font-semibold text-white truncate">Sam Altman on AGI Horizon & Chips</p>
+                      <div class="flex items-center gap-1.5 pt-0.5">
+                        <button class="flex-1 py-1 rounded bg-[#7C5CFF] hover:bg-[#6948ED] text-white text-[11px] font-bold transition flex items-center justify-center gap-1">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                          Edit
+                        </button>
+                        <button class="flex-1 py-1 rounded bg-[#252536] hover:bg-[#303046] text-slate-200 text-[11px] font-semibold transition flex items-center justify-center gap-1">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                          Export
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Card 2: Score 92 -->
+                  <div class="bg-[#181822] border border-[#28283C] rounded-xl p-2.5 flex flex-col gap-2.5 relative group hover:border-[#7C5CFF]/60 transition">
+                    <div class="flex items-center justify-between">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#7C5CFF]/20 text-[#C4B5FD] border border-[#7C5CFF]/30 flex items-center gap-1">
+                        ⚡ 92 Virality
+                      </span>
+                      <span class="text-[10px] font-mono text-slate-400">00:35</span>
+                    </div>
+
+                    <div class="aspect-[9/14] bg-[#0E0E15] rounded-lg border border-[#272738] overflow-hidden relative flex flex-col justify-between p-2">
+                      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0B0B0F]/40 to-[#0B0B0F] z-0"></div>
+                      <div class="relative z-10 flex justify-between items-start">
+                        <span class="px-1.5 py-0.5 bg-black/70 backdrop-blur rounded text-[9px] text-white font-mono">00:14:20 - 00:14:55</span>
+                      </div>
+                      <div class="relative z-10 text-center pb-1">
+                        <p class="text-[10px] font-extrabold uppercase leading-tight tracking-wide drop-shadow-md">
+                          <span class="text-white">THE SECRET</span>
+                          <span class="text-cyan-400">FORMULA</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                      <p class="text-xs font-semibold text-white truncate">How neural nets actually learn</p>
+                      <div class="flex items-center gap-1.5 pt-0.5">
+                        <button class="flex-1 py-1 rounded bg-[#232333] hover:bg-[#7C5CFF] hover:text-white text-slate-200 text-[11px] font-medium transition">Edit</button>
+                        <button class="flex-1 py-1 rounded bg-[#232333] hover:bg-[#303046] text-slate-200 text-[11px] font-medium transition">Export</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Card 3: Score 88 -->
+                  <div class="bg-[#181822] border border-[#28283C] rounded-xl p-2.5 flex flex-col gap-2.5 relative group hover:border-[#7C5CFF]/60 transition">
+                    <div class="flex items-center justify-between">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                        ✨ 88 Virality
+                      </span>
+                      <span class="text-[10px] font-mono text-slate-400">00:52</span>
+                    </div>
+
+                    <div class="aspect-[9/14] bg-[#0E0E15] rounded-lg border border-[#272738] overflow-hidden relative flex flex-col justify-between p-2">
+                      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0B0B0F]/40 to-[#0B0B0F] z-0"></div>
+                      <div class="relative z-10 flex justify-between items-start">
+                        <span class="px-1.5 py-0.5 bg-black/70 backdrop-blur rounded text-[9px] text-white font-mono">02:08:44 - 02:09:36</span>
+                      </div>
+                      <div class="relative z-10 text-center pb-1">
+                        <p class="text-[10px] font-extrabold uppercase leading-tight tracking-wide drop-shadow-md">
+                          <span class="text-[#FACC15]">UNEXPECTED</span>
+                          <span class="text-white">REACTION!</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                      <p class="text-xs font-semibold text-white truncate">Hilarious podcast blooper cut</p>
+                      <div class="flex items-center gap-1.5 pt-0.5">
+                        <button class="flex-1 py-1 rounded bg-[#232333] hover:bg-[#7C5CFF] hover:text-white text-slate-200 text-[11px] font-medium transition">Edit</button>
+                        <button class="flex-1 py-1 rounded bg-[#232333] hover:bg-[#303046] text-slate-200 text-[11px] font-medium transition">Export</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </main>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- COMPONENT 2 - VIDEO EDITOR SCREEN (Inside Left Column) -->
+        <!-- ========================================== -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="flex items-center justify-center w-6 h-6 rounded-md bg-[#7C5CFF] text-white text-xs font-bold font-mono">02</span>
+              <h2 class="text-lg font-bold text-white tracking-wide">Video Editor Screen & Multi-Track Studio</h2>
+            </div>
+            <span class="text-xs text-slate-400 font-mono">9:16 Kinetic Subtitles • 4 Audio/Video Tracks</span>
+          </div>
+
+          <!-- Video Editor Window -->
+          <div class="bg-[#15151C] border border-[#262635] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+            <!-- Top Toolbar -->
+            <div class="bg-[#111117] px-4 py-2.5 border-b border-[#21212E] flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-bold text-white">Clip #01 — AGI Horizon Moment</span>
+                <span class="text-[11px] font-mono text-[#FACC15] bg-[#FACC15]/10 px-2 py-0.5 rounded border border-[#FACC15]/20 font-semibold">Score: 99/100</span>
+                <span class="text-xs text-slate-400 font-mono">1080 × 1920 (9:16 Vertical)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button class="px-2.5 py-1 bg-[#1F1F2B] hover:bg-[#2B2B3B] text-xs font-medium text-slate-300 rounded border border-[#2B2B3C]">Auto-Reframe</button>
+                <button class="px-3 py-1 bg-[#7C5CFF] hover:bg-[#6B4BF4] text-xs font-bold text-white rounded shadow-sm shadow-[#7C5CFF]/30">Render Short</button>
+              </div>
+            </div>
+
+            <!-- Editor Center Stage: [Left Tools / 9:16 Centered Preview / Right Inspector] -->
+            <div class="grid grid-cols-12 min-h-[360px] bg-[#0A0A0F]">
+              
+              <!-- Left Tool Palette (Mini) -->
+              <div class="col-span-1 border-r border-[#1F1F2C] bg-[#111117] p-2 flex flex-col items-center gap-3">
+                <button class="w-8 h-8 rounded-lg bg-[#7C5CFF]/20 text-[#A78BFA] flex items-center justify-center text-xs" title="Select">⌖</button>
+                <button class="w-8 h-8 rounded-lg text-slate-400 hover:text-white flex items-center justify-center text-xs" title="Cut">✂</button>
+                <button class="w-8 h-8 rounded-lg text-slate-400 hover:text-white flex items-center justify-center text-xs" title="Text">T</button>
+                <button class="w-8 h-8 rounded-lg text-slate-400 hover:text-white flex items-center justify-center text-xs" title="Effects">✦</button>
+                <button class="w-8 h-8 rounded-lg text-slate-400 hover:text-white flex items-center justify-center text-xs" title="Music">♫</button>
+              </div>
+
+              <!-- Centered 9:16 Phone Preview Area -->
+              <div class="col-span-7 p-4 flex flex-col items-center justify-center relative bg-gradient-to-b from-[#0B0B0F] to-[#08080C]">
+                <!-- Phone Bezel / Screen -->
+                <div class="w-56 aspect-[9/16] bg-black rounded-2xl border-2 border-[#333346] shadow-2xl relative overflow-hidden flex flex-col justify-between p-3">
+                  <!-- Top In-Video Header -->
+                  <div class="flex justify-between items-center z-10">
+                    <span class="px-1.5 py-0.5 rounded bg-black/60 text-[9px] text-white font-mono">00:18.4</span>
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                  </div>
+
+                  <!-- Face Detection Bounding Box Overlay -->
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-32 h-36 rounded-2xl border border-dashed border-[#7C5CFF]/50 relative flex items-center justify-center">
+                      <span class="absolute -top-3 left-2 px-1 bg-[#7C5CFF] text-[8px] font-bold text-white rounded">AI Speaker Lock</span>
+                      <!-- Speaker Silhouette Illustration -->
+                      <div class="w-20 h-20 rounded-full bg-gradient-to-b from-indigo-500/20 to-purple-600/30 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-white/40" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Word-by-word Bold Yellow Captions Highlight -->
+                  <div class="relative z-20 text-center space-y-1 mb-6">
+                    <div class="inline-block bg-black/80 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-white/10 shadow-xl">
+                      <p class="text-xs font-black uppercase tracking-tight">
+                        <span class="text-white/60">THE</span>
+                        <span class="text-white/60">FUTURE</span>
+                        <span class="text-white/60">OF</span><br>
+                        <span class="text-[#FACC15] scale-110 inline-block drop-shadow-[0_2px_8px_rgba(250,204,21,0.6)] font-extrabold text-sm">INTELLIGENCE</span>
+                        <span class="text-white">IS</span>
+                        <span class="text-[#7C5CFF]">HERE</span>
+                      </p>
+                    </div>
+                    <div class="flex justify-center gap-1">
+                      <span class="w-1 h-1 rounded-full bg-[#FACC15]"></span>
+                      <span class="w-4 h-1 rounded-full bg-[#7C5CFF]"></span>
+                      <span class="w-1 h-1 rounded-full bg-white/40"></span>
+                    </div>
+                  </div>
+
+                  <!-- Floating Reaction Emojis -->
+                  <div class="absolute right-2 bottom-20 flex flex-col gap-2 z-20">
+                    <span class="text-xs bg-black/40 p-1 rounded-full backdrop-blur">🔥</span>
+                    <span class="text-xs bg-black/40 p-1 rounded-full backdrop-blur">⚡</span>
+                  </div>
+                </div>
+
+                <!-- Preview Playback Controls -->
+                <div class="mt-3 flex items-center gap-4 text-slate-300">
+                  <button class="text-xs hover:text-white">⏮ 5s</button>
+                  <button class="w-7 h-7 rounded-full bg-[#7C5CFF] text-white flex items-center justify-center font-bold shadow text-xs">▶</button>
+                  <button class="text-xs hover:text-white">5s ⏭</button>
+                </div>
+              </div>
+
+              <!-- Right Panel: Caption Styles, Transitions, Audio Mixer -->
+              <div class="col-span-4 border-l border-[#1F1F2C] bg-[#111117] p-3 flex flex-col gap-3.5 overflow-hidden">
+                <!-- Tabs -->
+                <div class="flex border-b border-[#21212E] pb-2 gap-2 text-[11px] font-semibold">
+                  <span class="text-[#7C5CFF] border-b-2 border-[#7C5CFF] pb-1 cursor-pointer">Captions</span>
+                  <span class="text-slate-400 hover:text-slate-200 cursor-pointer">Transitions</span>
+                  <span class="text-slate-400 hover:text-slate-200 cursor-pointer">Audio Mixer</span>
+                </div>
+
+                <!-- Caption Presets (Hormozi / MrBeast Style) -->
+                <div class="space-y-1.5">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Style Presets</span>
+                  <div class="grid grid-cols-2 gap-1.5">
+                    <div class="p-1.5 rounded-lg bg-[#1A1A24] border border-[#7C5CFF] flex flex-col items-center justify-center text-center">
+                      <span class="text-[11px] font-black text-[#FACC15]">HORMOZI</span>
+                      <span class="text-[9px] text-slate-400">Bold Yellow Pop</span>
+                    </div>
+                    <div class="p-1.5 rounded-lg bg-[#14141C] border border-[#262635] flex flex-col items-center justify-center text-center opacity-70">
+                      <span class="text-[11px] font-black text-cyan-400">BEAST</span>
+                      <span class="text-[9px] text-slate-400">Zoom Kinetic</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Transition Selector -->
+                <div class="space-y-1.5">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Auto Cut Transitions</span>
+                  <div class="flex items-center justify-between p-1.5 rounded-lg bg-[#161622] border border-[#262635] text-[11px]">
+                    <span class="text-slate-200">Whip Pan + Zoom</span>
+                    <span class="px-1.5 py-0.5 rounded bg-[#7C5CFF]/20 text-[#A78BFA] text-[10px] font-mono">0.15s</span>
+                  </div>
+                </div>
+
+                <!-- Audio Mixer Sliders -->
+                <div class="space-y-2 pt-1 border-t border-[#20202E]">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Audio Ducking & Mixer</span>
+                  
+                  <div class="space-y-1">
+                    <div class="flex justify-between text-[10px]">
+                      <span class="text-slate-300">Voice Isolation</span>
+                      <span class="text-[#7C5CFF] font-mono">100%</span>
+                    </div>
+                    <div class="w-full bg-[#20202E] h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-[#7C5CFF] h-full w-full"></div>
+                    </div>
+                  </div>
+
+                  <div class="space-y-1">
+                    <div class="flex justify-between text-[10px]">
+                      <span class="text-slate-300">Background Synth</span>
+                      <span class="text-cyan-400 font-mono">18% (-16dB)</span>
+                    </div>
+                    <div class="w-full bg-[#20202E] h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-cyan-400 h-full w-[25%]"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Multi-Track Timeline (Video, Captions, Sound Effects, Music) -->
+            <div class="bg-[#0D0D12] border-t border-[#21212E] p-3 space-y-1.5">
+              <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pb-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-white font-sans font-bold">Multi-Track Editor</span>
+                  <span>Tracks: 4 Active</span>
+                </div>
+                <span>Zoom: [—] 100% [+]</span>
+              </div>
+
+              <!-- Tracks Container -->
+              <div class="space-y-1 bg-[#12121A] p-2 rounded-xl border border-[#21212E]">
+                
+                <!-- Track 1: Video Track -->
+                <div class="flex items-center gap-2">
+                  <span class="w-16 text-[10px] font-semibold text-slate-400 truncate">🎬 Video</span>
+                  <div class="flex-1 h-7 bg-[#1A1A26] rounded-md relative overflow-hidden flex items-center px-1">
+                    <div class="w-3/4 h-5 bg-gradient-to-r from-indigo-900/60 to-purple-800/60 border border-[#7C5CFF] rounded flex items-center px-2 text-[10px] text-white">
+                      <span>Lex_Sam_Clip_01.mp4 (Face Center Reframed)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Track 2: Captions Track -->
+                <div class="flex items-center gap-2">
+                  <span class="w-16 text-[10px] font-semibold text-[#FACC15] truncate">💬 Captions</span>
+                  <div class="flex-1 h-7 bg-[#1A1A26] rounded-md relative overflow-hidden flex items-center px-1 gap-1">
+                    <span class="h-5 px-2 bg-[#FACC15]/20 border border-[#FACC15]/40 text-[#FACC15] text-[9px] font-mono rounded flex items-center">THE FUTURE</span>
+                    <span class="h-5 px-3 bg-[#FACC15] text-black font-extrabold text-[9px] font-mono rounded flex items-center shadow">INTELLIGENCE [HOT]</span>
+                    <span class="h-5 px-2 bg-[#FACC15]/20 border border-[#FACC15]/40 text-[#FACC15] text-[9px] font-mono rounded flex items-center">IS HERE</span>
+                  </div>
+                </div>
+
+                <!-- Track 3: Sound Effects (SFX) Track -->
+                <div class="flex items-center gap-2">
+                  <span class="w-16 text-[10px] font-semibold text-pink-400 truncate">💥 SFX</span>
+                  <div class="flex-1 h-6 bg-[#1A1A26] rounded-md relative overflow-hidden flex items-center px-1 gap-4">
+                    <span class="h-4 px-1.5 bg-pink-500/30 text-pink-300 border border-pink-500/40 text-[8px] rounded ml-12">Whoosh.wav</span>
+                    <span class="h-4 px-1.5 bg-pink-500/30 text-pink-300 border border-pink-500/40 text-[8px] rounded ml-24">Impact_Boom.wav</span>
+                  </div>
+                </div>
+
+                <!-- Track 4: Music Track -->
+                <div class="flex items-center gap-2">
+                  <span class="w-16 text-[10px] font-semibold text-cyan-400 truncate">🎵 Music</span>
+                  <div class="flex-1 h-6 bg-[#1A1A26] rounded-md relative overflow-hidden flex items-center px-1">
+                    <div class="w-full h-4 bg-cyan-950/40 border border-cyan-500/30 rounded flex items-center px-2 text-[9px] text-cyan-300">
+                      <span>Dark Phonk Beats (Auto Ducked under voice)</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- ========================================== -->
+      <!-- RIGHT SECTION: COMPONENT 3 (LANDING PAGE) & COMPONENT 4 (MOBILE APPS) (5 Cols) -->
+      <!-- ========================================== -->
+      <div class="xl:col-span-5 flex flex-col gap-8">
+        
+        <!-- ========================================== -->
+        <!-- COMPONENT 3: LANDING PAGE SHOWCASE -->
+        <!-- ========================================== -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="flex items-center justify-center w-6 h-6 rounded-md bg-[#7C5CFF] text-white text-xs font-bold font-mono">03</span>
+              <h2 class="text-lg font-bold text-white tracking-wide">High-Converting Landing Page</h2>
+            </div>
+            <span class="text-xs text-slate-400 font-mono">Hero • Smart URL Bar • Features</span>
+          </div>
+
+          <!-- Landing Page Browser Window -->
+          <div class="bg-[#15151C] border border-[#262635] rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+            <!-- Browser Header -->
+            <div class="bg-[#111117] px-4 py-2 border-b border-[#21212E] flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#FF5F56]/80 inline-block"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]/80 inline-block"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#27C93F]/80 inline-block"></span>
+                <span class="ml-2 text-[11px] font-mono text-slate-400">clipforge.ai</span>
+              </div>
+              <div class="text-[10px] text-[#A78BFA] bg-[#7C5CFF]/15 px-2 py-0.5 rounded font-mono">AI Engine Online</div>
+            </div>
+
+            <!-- Landing Page Content Body -->
+            <div class="p-6 bg-gradient-to-b from-[#0E0E14] via-[#0B0B0F] to-[#12121B] space-y-6 relative overflow-hidden">
+              
+              <!-- Subtle Hero Glow -->
+              <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[#7C5CFF]/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+              <!-- Top Micro Nav -->
+              <div class="flex justify-between items-center relative z-10 text-xs">
+                <div class="flex items-center gap-2">
+                  <div class="w-5 h-5 rounded-md bg-[#7C5CFF] flex items-center justify-center text-white text-[10px] font-bold">CF</div>
+                  <span class="font-bold text-white text-xs">ClipForge</span>
+                </div>
+                <div class="flex items-center gap-4 text-slate-400 text-[11px]">
+                  <span>Features</span>
+                  <span>Pricing</span>
+                  <span class="text-[#7C5CFF] font-semibold">Sign In</span>
+                </div>
+              </div>
+
+              <!-- Hero Heading & Tagline -->
+              <div class="text-center space-y-2 relative z-10 max-w-md mx-auto pt-2">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#7C5CFF]/15 border border-[#7C5CFF]/30 text-[#C4B5FD] text-[11px] font-medium">
+                  <span>✨ Powered by Gemini 1.5 & Whisper AI</span>
+                </div>
+                <h3 class="text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                  Turn long videos into <span class="bg-gradient-to-r from-[#7C5CFF] via-[#A78BFA] to-cyan-400 bg-clip-text text-transparent">viral shorts</span> in seconds.
+                </h3>
+                <p class="text-xs text-slate-400">
+                  Drop any YouTube link, podcast, or live stream. Our AI finds the most hook-worthy moments, crops faces, and writes captions.
+                </p>
+              </div>
+
+              <!-- URL Input Box with Glow -->
+              <div class="max-w-md mx-auto relative z-10">
+                <div class="p-1 rounded-xl bg-gradient-to-r from-[#7C5CFF] to-cyan-500 shadow-lg shadow-[#7C5CFF]/20">
+                  <div class="flex items-center bg-[#0B0B0F] rounded-lg p-1.5 gap-2">
+                    <span class="pl-2 text-slate-400 text-xs">🔗</span>
+                    <input type="text" placeholder="Paste YouTube, Twitch or podcast URL..." class="bg-transparent flex-1 text-xs text-white placeholder-slate-500 focus:outline-none" value="https://youtube.com/watch?v=viral-podcast-ep78">
+                    <button class="px-4 py-2 bg-[#7C5CFF] hover:bg-[#6948ED] text-white text-xs font-bold rounded-md shadow flex items-center gap-1 transition">
+                      <span>Generate</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="flex items-center justify-center gap-4 mt-2 text-[10px] text-slate-400">
+                  <span>✓ 1-Click Viral Detection</span>
+                  <span>✓ Auto 9:16 Reframe</span>
+                  <span>✓ 100% Free Trial</span>
+                </div>
+              </div>
+
+              <!-- Phone Mockups Presentation Teaser -->
+              <div class="flex justify-center items-end gap-3 pt-2 relative z-10">
+                <!-- Phone 1 (Tilted Left) -->
+                <div class="w-24 aspect-[9/16] bg-[#151520] border-2 border-[#2B2B3E] rounded-xl shadow-xl overflow-hidden -rotate-6 transform scale-95 p-1 flex flex-col justify-between">
+                  <div class="w-6 h-1 bg-white/20 rounded-full mx-auto"></div>
+                  <div class="text-center">
+                    <span class="text-[7px] font-bold text-[#FACC15] block uppercase">HOOKED</span>
+                    <span class="text-[6px] text-white block">Virality 98%</span>
+                  </div>
+                  <div class="h-1 bg-[#7C5CFF] rounded"></div>
+                </div>
+
+                <!-- Phone 2 (Center Hero Phone) -->
+                <div class="w-32 aspect-[9/16] bg-[#181826] border-2 border-[#7C5CFF] rounded-2xl shadow-2xl overflow-hidden p-1.5 flex flex-col justify-between relative glow-accent">
+                  <div class="flex justify-between items-center px-1">
+                    <span class="text-[8px] text-white font-mono">Shorts</span>
+                    <span class="px-1 py-0.2 rounded bg-red-500 text-[6px] text-white font-bold">LIVE</span>
+                  </div>
+                  <div class="text-center space-y-0.5">
+                    <span class="text-[8px] font-black text-white block">"YOU WON'T BELIEVE"</span>
+                    <span class="text-[9px] font-black text-[#FACC15] bg-black/60 px-1 rounded block">THIS SECRET</span>
+                  </div>
+                  <div class="flex items-center justify-between text-[7px] text-slate-300 px-1">
+                    <span>❤️ 1.4M</span>
+                    <span>💬 8.2k</span>
+                  </div>
+                </div>
+
+                <!-- Phone 3 (Tilted Right) -->
+                <div class="w-24 aspect-[9/16] bg-[#151520] border-2 border-[#2B2B3E] rounded-xl shadow-xl overflow-hidden rotate-6 transform scale-95 p-1 flex flex-col justify-between">
+                  <div class="w-6 h-1 bg-white/20 rounded-full mx-auto"></div>
+                  <div class="text-center">
+                    <span class="text-[7px] font-bold text-cyan-400 block uppercase">STORY</span>
+                    <span class="text-[6px] text-white block">Virality 94%</span>
+                  </div>
+                  <div class="h-1 bg-cyan-400 rounded"></div>
+                </div>
+              </div>
+
+              <!-- Features Grid (3 Columns) -->
+              <div class="grid grid-cols-3 gap-2.5 pt-2 border-t border-[#1C1C28]">
+                <div class="p-2.5 rounded-xl bg-[#14141E] border border-[#212130] space-y-1">
+                  <span class="text-sm">🎯</span>
+                  <h4 class="text-xs font-bold text-white">AI Hook Detection</h4>
+                  <p class="text-[10px] text-slate-400 leading-snug">Extracts peak emotional and viral audio cues.</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-[#14141E] border border-[#212130] space-y-1">
+                  <span class="text-sm">🗣️</span>
+                  <h4 class="text-xs font-bold text-white">Kinetic Subtitles</h4>
+                  <p class="text-[10px] text-slate-400 leading-snug">Alex Hormozi style captions with emojis.</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-[#14141E] border border-[#212130] space-y-1">
+                  <span class="text-sm">⚡</span>
+                  <h4 class="text-xs font-bold text-white">Smart Reframe</h4>
+                  <p class="text-[10px] text-slate-400 leading-snug">Active speaker face tracking for 9:16 shorts.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- COMPONENT 4: TWO MOBILE APP SCREENS -->
+        <!-- ========================================== -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="flex items-center justify-center w-6 h-6 rounded-md bg-[#7C5CFF] text-white text-xs font-bold font-mono">04</span>
+              <h2 class="text-lg font-bold text-white tracking-wide">Mobile App Companion Screens</h2>
+            </div>
+            <span class="text-xs text-slate-400 font-mono">iOS / Android System • Bottom Navigation</span>
+          </div>
+
+          <!-- Mobile Screens Pair Container -->
+          <div class="grid grid-cols-2 gap-4">
+            
+            <!-- Mobile Screen 1: Feed & Moments Discover -->
+            <div class="bg-[#15151C] border border-[#262635] rounded-3xl p-3 shadow-2xl flex flex-col justify-between min-h-[460px] relative overflow-hidden">
+              <!-- Notch & Status Bar -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center px-2 text-[10px] text-slate-400 font-mono">
+                  <span>09:41</span>
+                  <div class="w-16 h-3 bg-black rounded-full mx-auto"></div>
+                  <span>5G 100%</span>
+                </div>
+
+                <!-- Mobile Top Header -->
+                <div class="flex items-center justify-between px-1 pt-1">
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-5 h-5 rounded-md bg-[#7C5CFF] flex items-center justify-center text-white text-[10px] font-bold">CF</div>
+                    <span class="text-xs font-bold text-white">ClipForge</span>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full bg-[#7C5CFF]/20 text-[#A78BFA] text-[9px] font-bold">8 Moments</span>
+                </div>
+
+                <!-- Active Project Card (Mobile) -->
+                <div class="p-2 rounded-xl bg-[#1A1A26] border border-[#29293C] space-y-1.5">
+                  <div class="flex justify-between items-center text-[10px]">
+                    <span class="font-bold text-white">AI Stream Session</span>
+                    <span class="text-emerald-400 font-mono">● Analyzed</span>
+                  </div>
+                  <div class="h-1 bg-[#101018] rounded-full overflow-hidden">
+                    <div class="bg-[#7C5CFF] h-full w-full"></div>
+                  </div>
+                </div>
+
+                <!-- Mobile Moment Vertical Card -->
+                <div class="bg-[#12121A] border border-[#2A2A3D] rounded-xl p-2 space-y-2">
+                  <div class="flex items-center justify-between text-[10px]">
+                    <span class="px-1.5 py-0.5 rounded bg-gradient-to-r from-[#7C5CFF] to-pink-500 text-white font-bold text-[9px]">🔥 Score: 99</span>
+                    <span class="font-mono text-slate-400 text-[9px]">00:48</span>
+                  </div>
+                  
+                  <!-- Preview Video Mini -->
+                  <div class="aspect-video bg-[#0A0A0F] rounded-lg border border-[#242436] flex flex-col justify-end p-2 relative overflow-hidden">
+                    <div class="absolute inset-0 flex items-center justify-center opacity-30">
+                      <span class="text-xs text-white">▶</span>
+                    </div>
+                    <p class="text-[9px] font-black text-[#FACC15] bg-black/70 px-1 rounded inline-block">"THE BIGGEST SHIFT"</p>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-1 pt-1">
+                    <button class="flex-1 py-1 rounded bg-[#7C5CFF] text-white text-[10px] font-bold">Quick Edit</button>
+                    <button class="py-1 px-2.5 rounded bg-[#20202E] text-slate-300 text-[10px]">Share</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom Navigation Bar (Screen 1) -->
+              <div class="bg-[#0E0E15] border border-[#232332] rounded-2xl p-1.5 flex items-center justify-around mt-3">
+                <div class="flex flex-col items-center text-[#7C5CFF]">
+                  <span class="text-xs">⚡</span>
+                  <span class="text-[8px] font-bold">Moments</span>
+                </div>
+                <div class="flex flex-col items-center text-slate-500">
+                  <span class="text-xs">🎬</span>
+                  <span class="text-[8px]">Projects</span>
+                </div>
+                <div class="flex flex-col items-center text-slate-500">
+                  <span class="text-xs">➕</span>
+                  <span class="text-[8px]">New</span>
+                </div>
+                <div class="flex flex-col items-center text-slate-500">
+                  <span class="text-xs">⚙️</span>
+                  <span class="text-[8px]">Settings</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Screen 2: Export & Social Publisher -->
+            <div class="bg-[#15151C] border border-[#262635] rounded-3xl p-3 shadow-2xl flex flex-col justify-between min-h-[460px] relative overflow-hidden">
+              <!-- Notch & Status Bar -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center px-2 text-[10px] text-slate-400 font-mono">
+                  <span>09:41</span>
+                  <div class="w-16 h-3 bg-black rounded-full mx-auto"></div>
+                  <span>5G 100%</span>
+                </div>
+
+                <!-- Header -->
+                <div class="flex items-center justify-between px-1 pt-1">
+                  <span class="text-xs font-bold text-white">Publish Short</span>
+                  <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Ready in 4K</span>
+                </div>
+
+                <!-- Video Summary -->
+                <div class="flex items-center gap-2 p-2 rounded-xl bg-[#1A1A26] border border-[#29293C]">
+                  <div class="w-10 aspect-[9/16] bg-black rounded border border-[#3C3C50] flex items-center justify-center text-[8px] text-[#FACC15] font-bold">9:16</div>
+                  <div class="flex-1 text-[10px] space-y-0.5">
+                    <p class="font-bold text-white truncate">Sam Altman on AGI Horizon</p>
+                    <p class="text-slate-400">Duration: 48s • 1080x1920</p>
+                    <span class="text-[9px] text-[#A78BFA] font-mono">virality_score: 99</span>
+                  </div>
+                </div>
+
+                <!-- Target Social Channels Toggles -->
+                <div class="space-y-1.5 pt-1">
+                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Direct Auto-Publish</span>
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between p-1.5 rounded-lg bg-[#14141E] border border-[#232334] text-[10px]">
+                      <span class="flex items-center gap-1.5 text-white font-medium"><span>📱</span> TikTok</span>
+                      <span class="w-6 h-3.5 bg-[#7C5CFF] rounded-full flex items-center justify-end px-0.5"><span class="w-2.5 h-2.5 bg-white rounded-full"></span></span>
+                    </div>
+                    <div class="flex items-center justify-between p-1.5 rounded-lg bg-[#14141E] border border-[#232334] text-[10px]">
+                      <span class="flex items-center gap-1.5 text-white font-medium"><span>▶</span> YouTube Shorts</span>
+                      <span class="w-6 h-3.5 bg-[#7C5CFF] rounded-full flex items-center justify-end px-0.5"><span class="w-2.5 h-2.5 bg-white rounded-full"></span></span>
+                    </div>
+                    <div class="flex items-center justify-between p-1.5 rounded-lg bg-[#14141E] border border-[#232334] text-[10px]">
+                      <span class="flex items-center gap-1.5 text-white font-medium"><span>📸</span> Instagram Reels</span>
+                      <span class="w-6 h-3.5 bg-[#7C5CFF] rounded-full flex items-center justify-end px-0.5"><span class="w-2.5 h-2.5 bg-white rounded-full"></span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- AI Generated Viral Title & Tags -->
+                <div class="p-2 rounded-lg bg-[#101018] border border-[#252536] text-[10px] space-y-1">
+                  <span class="text-[9px] text-[#A78BFA] font-semibold">AI Generated Hook Caption:</span>
+                  <p class="text-slate-300 italic text-[9px]">"The moment everything changed forever... 🤯 #agi #tech #podcast"</p>
+                </div>
+              </div>
+
+              <!-- Bottom Action & Navigation (Screen 2) -->
+              <div class="space-y-2 mt-2">
+                <button class="w-full py-2 bg-gradient-to-r from-[#7C5CFF] to-[#6948ED] text-white text-[11px] font-bold rounded-xl shadow-lg shadow-[#7C5CFF]/30 transition">
+                  Publish to All 3 Channels
+                </button>
+                <div class="bg-[#0E0E15] border border-[#232332] rounded-2xl p-1.5 flex items-center justify-around">
+                  <div class="flex flex-col items-center text-slate-500">
+                    <span class="text-xs">⚡</span>
+                    <span class="text-[8px]">Moments</span>
+                  </div>
+                  <div class="flex flex-col items-center text-slate-500">
+                    <span class="text-xs">🎬</span>
+                    <span class="text-[8px]">Projects</span>
+                  </div>
+                  <div class="flex flex-col items-center text-[#7C5CFF]">
+                    <span class="text-xs">📤</span>
+                    <span class="text-[8px] font-bold">Exports</span>
+                  </div>
+                  <div class="flex flex-col items-center text-slate-500">
+                    <span class="text-xs">⚙️</span>
+                    <span class="text-[8px]">Settings</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Presentation Footer: Design System Specs Bar -->
+    <footer class="mt-12 pt-6 border-t border-[#1C1C28] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400 relative z-10">
+      <div class="flex items-center gap-6">
+        <span class="font-bold text-white">ClipForge Design Tokens:</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#0B0B0F] border border-slate-700"></span> Canvas Background (#0B0B0F)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#15151C] border border-slate-600"></span> Cards Surface (#15151C)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#7C5CFF]"></span> Primary Accent (#7C5CFF)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-[#FACC15]"></span> Kinetic Caption (#FACC15)</span>
+      </div>
+      <div class="flex items-center gap-4 font-mono text-[11px]">
+        <span>Typography: Inter & Plus Jakarta Sans</span>
+        <span>•</span>
+        <span class="text-[#7C5CFF]">Dribbble / Behance Showcase Ready</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

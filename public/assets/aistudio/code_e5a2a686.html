@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface-container-high":"#232a34","outline":"#938ea1","inverse-primary":"#603ce2","on-tertiary-container":"#442000","primary-fixed-dim":"#cabeff","background":"#0d141d","primary-fixed":"#e6deff","on-primary":"#31009a","surface-container":"#192029","on-error-container":"#ffdad6","surface-container-low":"#151c25","on-tertiary":"#4e2600","secondary-container":"#eec200","on-primary-fixed":"#1c0062","tertiary-fixed":"#ffdcc4","secondary":"#ffe083","on-tertiary-fixed-variant":"#6f3800","on-background":"#dce3f0","on-primary-fixed-variant":"#4816cb","inverse-on-surface":"#2a313b","on-surface-variant":"#c9c4d8","surface-variant":"#2e353f","on-secondary-fixed":"#231b00","tertiary-fixed-dim":"#ffb780","on-secondary-fixed-variant":"#574500","surface-bright":"#333a44","surface":"#0d141d","on-secondary":"#3c2f00","secondary-fixed-dim":"#eec200","error":"#ffb4ab","on-tertiary-fixed":"#2f1400","surface-tint":"#cabeff","tertiary-container":"#d7791f","surface-container-highest":"#2e353f","on-error":"#690005","tertiary":"#ffb780","primary-container":"#947dff","surface-container-lowest":"#080f17","primary":"#cabeff","inverse-surface":"#dce3f0","on-secondary-container":"#645000","surface-dim":"#0d141d","on-primary-container":"#2a0088","on-surface":"#dce3f0","outline-variant":"#484555","error-container":"#93000a","secondary-fixed":"#ffe083"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"gutter-desktop":"1.5rem","margin":"1rem","margin-desktop":"2rem","gutter":"1rem","space-sm":"0.5rem","space-md":"1rem","space-xl":"2.5rem","space-xs":"0.25rem","space-lg":"1.5rem"},"fontFamily":{"display-mobile":["Space Grotesk"],"display":["Space Grotesk"],"headline-lg":["Space Grotesk"],"title-md":["Inter"],"body-sm":["Inter"],"headline-md":["Space Grotesk"],"headline-lg-mobile":["Space Grotesk"],"body-md":["Inter"],"body-lg":["Inter"],"label-sm":["JetBrains Mono"],"label-md":["JetBrains Mono"]},"fontSize":{"display-mobile":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"display":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.015em","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-sm":["10px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"500"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"500"}]}}}}</script></head><body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low z-50 flex flex-col justify-between py-space-md"><div class="flex flex-col gap-space-md"><div class="px-space-md flex items-center gap-space-xs"><div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-[0_0_16px_rgba(124,92,255,0.4)]"><span class="material-symbols-outlined text-on-primary text-[20px]">auto_videocam</span></div><span class="font-headline-md text-headline-md tracking-tight text-on-surface">Clip<span class="text-primary">Forge</span></span></div><div class="px-space-md"><div class="flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-surface-container"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-label-sm text-secondary tracking-wide uppercase">AI Engine Online</span></div></div><nav class="flex flex-col gap-space-xs px-space-sm" data-active-classes="bg-surface-container-high text-on-surface font-title-md text-title-md rounded-lg"><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="video-editor" href="#"><span class="material-symbols-outlined text-[20px]">movie_edit</span><span>Video Editor</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-space-sm transition-colors bg-surface-container-high text-on-surface font-title-md text-title-md rounded-lg" data-path="mobile-companion" href="#"><span class="material-symbols-outlined text-[20px]">phone_iphone</span><span>Mobile Companion</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="landing-page" href="#"><span class="material-symbols-outlined text-[20px]">public</span><span>Landing Page</span></a></nav></div><div class="px-space-md flex flex-col gap-space-sm"><div class="p-space-sm rounded-lg bg-surface-container flex items-center justify-between"><div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Plan</span><span class="font-title-md text-title-md text-secondary">Pro Trial (7d)</span></div><span class="material-symbols-outlined text-secondary text-[20px]">workspace_premium</span></div><div class="flex items-center gap-space-sm pt-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="flex flex-col truncate"><span class="font-title-md text-title-md text-on-surface truncate">Creator Studio</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">prod@clipforge.ai</span></div></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.2)] z-40 flex items-center justify-between px-space-md md:px-margin-desktop"><nav class="flex items-center gap-space-xs" data-active-classes="bg-surface-container text-on-surface font-title-md text-title-md rounded-lg"><a class="px-space-md py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="landing-page" href="#">Landing Page</a><a class="px-space-md py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="dashboard" href="#">Dashboard</a><a class="px-space-md py-space-xs rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-md text-body-md" data-path="video-editor" href="#">Video Editor</a><a aria-current="page" class="px-space-md py-space-xs transition-colors bg-surface-container text-on-surface font-title-md text-title-md rounded-lg" data-path="mobile-companion" href="#">Mobile Companion</a></nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-surface-container-high"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-label-sm text-secondary tracking-wide uppercase">AI Engine Online</span></div><div class="px-space-sm py-space-xs rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold uppercase tracking-wider inline-flex items-center gap-space-xs"><span class="material-symbols-outlined text-[14px]">bolt</span>Pro Trial</div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<div class="relative w-full overflow-hidden px-margin-desktop py-space-xl flex flex-col gap-space-xl">
+<!-- Ambient Background Depth Flares -->
+<div class="absolute -top-32 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute top-1/2 -right-24 w-80 h-80 bg-secondary/10 rounded-full blur-[100px] pointer-events-none"></div>
+<!-- Screen Narrative Header -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md z-10">
+<div class="flex flex-col gap-space-xs max-w-2xl">
+<div class="flex items-center gap-space-xs">
+<span class="px-space-sm py-space-xs rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm uppercase tracking-wider flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+            Pocket Deck Mode
+          </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">iOS • v2.4.1 Production Core</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+          Mobile Companion Suite
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Autonomously mine raw stream footage on the fly and dispatch 4K rendered hooks directly to major social platforms before your live feed ends.
+        </p>
+</div>
+<!-- Quick Telemetry Bar -->
+<div class="flex items-center gap-space-sm bg-surface-container-low p-space-sm rounded-xl">
+<div class="flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-secondary text-[18px]">bolt</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">PULSE LATENCY</span>
+<span class="font-label-md text-label-md text-on-surface">140ms Native Sync</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-space-xs bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">AUTH TOKENS</span>
+<span class="font-label-md text-label-md text-secondary">3 Connected</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Dual Phone Showcase Deck -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-space-xl items-start justify-center max-w-7xl mx-auto w-full z-10">
+<!-- ==================== LEFT PHONE: STREAM & MOMENTS ==================== -->
+<div class="flex flex-col items-center">
+<!-- Section Monospaced Identifier -->
+<div class="w-full max-w-[390px] mb-space-sm flex items-center justify-between px-space-xs">
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">sensors</span> VIEW 01: MOMENTS DISCOVERY
+          </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">STREAM HARVESTER</span>
+</div>
+<!-- Physical Phone Chassis -->
+<div class="w-full max-w-[390px] bg-surface-container-lowest rounded-[44px] p-3 shadow-2xl relative transition-transform duration-300 hover:scale-[1.01]">
+<!-- Screen Shell Inner (Mobile Viewport) -->
+<div class="w-full bg-surface-container-low rounded-[36px] overflow-hidden flex flex-col h-[780px] relative">
+<!-- Dynamic Island Notch & Native iOS Status Bar -->
+<div class="pt-3 px-6 pb-2 flex items-center justify-between text-on-surface select-none z-30">
+<span class="font-label-sm text-label-sm font-semibold tracking-tight">09:41</span>
+<!-- Hardware Pill Dynamic Island -->
+<div class="w-24 h-5 bg-surface-container-lowest rounded-full flex items-center justify-end px-2 gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="w-2 h-2 rounded-full bg-primary/40"></span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
+<span class="font-label-sm text-label-sm font-semibold">5G</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- In-App Header -->
+<div class="px-space-md py-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[16px]">auto_videocam</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-[15px] leading-tight text-on-surface">Clip<span class="text-primary">Forge</span></span>
+<span class="font-label-sm text-[9px] text-secondary leading-none uppercase">Live Scout v2</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<div class="px-space-xs py-0.5 rounded-full bg-surface-container text-secondary font-label-sm text-[10px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  8 Moments Found
+                </div>
+<button class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+</div>
+</div>
+<!-- Scrollable Mobile Feed Content Area -->
+<div class="flex-1 overflow-y-auto px-space-md py-space-xs flex flex-col gap-space-md">
+<!-- Active Stream Processing Card -->
+<div class="bg-surface-container p-space-sm rounded-xl relative overflow-hidden">
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-error animate-ping"></span>
+<span class="font-label-sm text-[10px] text-error font-semibold tracking-wide uppercase">Processing Stream</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">01:42:19</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex-shrink-0 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Podcast host Lex Fridman sitting in front of professional microphone in a dark studio set with soft edge lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDf_aiFQin7GyDyuLUK0iC16EsGii3Yh_qPj9Kojab8ImBudsjALzzycraHhGcUL_5erzr_fJxkbos5P8E48spBVDKMSfd-h4TWZgCGQlHBYJxkrThdltcVB3_igZ42UbhAj_OHlWsZ-i4ysozMOybzCl1HYTA3ZHjeOQqNJFvVuKVF1z8vCRwbUffXYEGVbHsph76Cfj17usytouyRgOmzD1tbwoWogd3VaFKpts"/>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<span class="font-title-md text-body-md text-on-surface truncate">Lex Fridman #421 • Sam Altman</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">AI Stream Session • Whisper Sync 100%</span>
+</div>
+</div>
+<!-- Visual Pipeline Bar -->
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full mt-2 overflow-hidden flex">
+<div class="bg-primary h-full w-4/5 rounded-full"></div>
+</div>
+</div>
+<!-- Top Viral Hook Card (Featured Hero Moment) -->
+<div class="bg-surface-container rounded-xl overflow-hidden shadow-lg flex flex-col">
+<!-- Video Screen Thumbnail -->
+<div class="relative w-full aspect-[9/13] bg-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Dramatic high contrast close up of technology executive speaking with intensity, neon rim light violet and dark charcoal background studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrMa4TT4XIM2j8_9qhGGe-4nDmkEGG9JFDDwfcUEQtLX9mnQTqS4CysPWcyWqpXyYGa2MvaccA1TsMSwHqTDgULcLacym1h5MU6lLhuyG7fZuZfDmBbKwZq4UpSJsU8rXxh31TE6JKqAiV-E8LrQC2-_yGWKzqs7hvx6g3kwOwYrx2mCII-0HdBBJnJRhIkerUMPIhNDpz2Y7yKOzSkiph7MPm4gGkTj9S-gUt4Do"/>
+<!-- Gradient Scrim for Contrast -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/30 to-transparent"></div>
+<!-- Virality Floating Pill Badge -->
+<div class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-full bg-secondary-container/90 backdrop-blur-md text-on-secondary-container font-label-sm text-[10px] font-bold tracking-wider flex items-center gap-1 shadow-md">
+<span class="material-symbols-outlined text-[13px]">local_fire_department</span>
+                    SCORE 99
+                  </div>
+<!-- Face Track Box Indicator -->
+<div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-32 h-40 border-2 border-primary/60 rounded-xl pointer-events-none flex flex-col justify-between p-1">
+<span class="font-label-sm text-[8px] text-primary uppercase bg-surface-container-lowest/80 px-1 rounded w-max">Active Speaker Track</span>
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-primary text-[14px]">center_focus_strong</span>
+</div>
+</div>
+<!-- Duration Chip -->
+<div class="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded bg-surface-container-lowest/80 backdrop-blur-md text-on-surface font-label-sm text-[10px]">
+                    00:48 • 9:16 Crop
+                  </div>
+<!-- Kinetic Hook Overlay Headline -->
+<div class="absolute bottom-2.5 right-2.5 left-2.5 text-center px-1">
+<span class="inline-block bg-primary text-on-primary font-headline-md text-body-md uppercase px-2 py-0.5 rounded tracking-wide shadow-lg">
+                      “THE BIGGEST SHIFT IN TECH”
+                    </span>
+</div>
+</div>
+<!-- Card Body & Action Hub -->
+<div class="p-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">mic</span> Voice Isolation ON
+                    </span>
+<span class="font-label-sm text-label-sm text-secondary">Est. Views: 1.2M+</span>
+</div>
+<div class="grid grid-cols-2 gap-space-xs pt-1">
+<button class="py-2 px-space-xs rounded-lg bg-surface-container-high text-on-surface font-title-md text-body-sm hover:bg-surface-bright flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+                      Quick Edit
+                    </button>
+<button class="py-2 px-space-xs rounded-lg bg-primary text-on-primary font-title-md text-body-sm hover:bg-primary-container flex items-center justify-center gap-1 shadow-md transition-colors">
+<span class="material-symbols-outlined text-[16px]">send</span>
+                      Share Socials
+                    </button>
+</div>
+</div>
+</div>
+<!-- Other Discovered Moments Section -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Queue Highlights</span>
+<span class="font-label-sm text-label-sm text-primary">Sort: Virality</span>
+</div>
+<!-- Discovered Moment Item 1 -->
+<div class="p-space-xs bg-surface-container rounded-xl flex items-center justify-between hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-space-xs">
+<div class="w-12 h-14 rounded-lg bg-surface-container-lowest relative overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Video podcast speaker candid laughing moment in dark tech studio backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMm6SB_6ay-3zn9lU5CchEOXBoPlKaFCjES2LEzpsiS8GgD8NDYoaJserIOQJ6yZbMcm9Lq8MyYELvBu4aW9-Pu-rnu8uaEhYyM4XRKzjmPmXXwBIuWrA3wf4yPS2A0pWpSc2iHfxn9NryA7XIsFg5ShL12RGJyqtSCvrSGyOPoAH9DSJBaTOElgGIX4ExzIACOC0ZRqPuoZJB8gx_c1n3iyZBSLzHA9Kv5h2pblE"/>
+<div class="absolute inset-0 bg-surface-container-lowest/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface text-[16px]">play_circle</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-sm text-on-surface">Neural Net Consciousness</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">00:32 • Hook: 3.2s drop</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-sm text-[10px] font-bold">
+                      SCORE 94
+                    </span>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Discovered Moment Item 2 -->
+<div class="p-space-xs bg-surface-container rounded-xl flex items-center justify-between hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-space-xs">
+<div class="w-12 h-14 rounded-lg bg-surface-container-lowest relative overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="High tech laboratory screen showing visual neural weights and diagrams in blue neon colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVGSiz5JAx-HdsboqRw4OdcPH7Si2LXiMDWmFWEEOecoQCMEGcwKvgtXtgGd1FIl6RUaQofFylXZmSHklhCvMbJnga6rOCqQzykKU78nRUJMrNforlSWOw3K0Sl63yCDSd-DVhe9h2VtKDpXbJqjt775yJSkTLsb6AffHrAAaEEJrf7gTio4avwM7cXtgoG0v8I77axlOBd3DvnVBRE2OM_zHO5Gmhm75IdApHBx4"/>
+<div class="absolute inset-0 bg-surface-container-lowest/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface text-[16px]">play_circle</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-body-sm text-on-surface">The $7 Trillion Compute Bet</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">00:54 • Viral cadence</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-secondary font-label-sm text-[10px] font-bold">
+                      SCORE 91
+                    </span>
+<button class="text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Native iOS Bottom Tab Bar -->
+<div class="bg-surface-container-lowest/95 backdrop-blur-md px-space-md pt-2 pb-5 flex items-center justify-around z-20">
+<button class="flex flex-col items-center gap-0.5 text-primary">
+<span class="material-symbols-outlined text-[20px]">auto_awesome_motion</span>
+<span class="font-label-sm text-[10px] font-bold">Moments</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">video_library</span>
+<span class="font-label-sm text-[10px]">Projects</span>
+</button>
+<div class="relative -top-3">
+<button class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-[22px]">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">schedule_send</span>
+<span class="font-label-sm text-[10px]">Publisher</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-label-sm text-[10px]">Config</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- ==================== RIGHT PHONE: MULTI-CHANNEL PUBLISHER ==================== -->
+<div class="flex flex-col items-center">
+<!-- Section Monospaced Identifier -->
+<div class="w-full max-w-[390px] mb-space-sm flex items-center justify-between px-space-xs">
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">bolt</span> VIEW 02: 1-CLICK PUBLISHER
+          </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">MULTI-BROADCAST</span>
+</div>
+<!-- Physical Phone Chassis -->
+<div class="w-full max-w-[390px] bg-surface-container-lowest rounded-[44px] p-3 shadow-2xl relative transition-transform duration-300 hover:scale-[1.01]">
+<!-- Screen Shell Inner (Mobile Viewport) -->
+<div class="w-full bg-surface-container-low rounded-[36px] overflow-hidden flex flex-col h-[780px] relative">
+<!-- Dynamic Island Notch & Native iOS Status Bar -->
+<div class="pt-3 px-6 pb-2 flex items-center justify-between text-on-surface select-none z-30">
+<span class="font-label-sm text-label-sm font-semibold tracking-tight">09:41</span>
+<div class="w-24 h-5 bg-surface-container-lowest rounded-full flex items-center justify-end px-2 gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[14px]">signal_cellular_alt</span>
+<span class="font-label-sm text-label-sm font-semibold">5G</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- In-App Header -->
+<div class="px-space-md py-space-xs flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<button class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<span class="font-headline-md text-[15px] leading-tight text-on-surface">Publish Short</span>
+<span class="font-label-sm text-[9px] text-primary leading-none uppercase">Ready in 4K 60fps • HDR</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-secondary">cloud_done</span>
+</div>
+</div>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto px-space-md py-space-xs flex flex-col gap-space-md">
+<!-- Clip Summary Header Badge -->
+<div class="bg-surface-container p-space-sm rounded-xl flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-xs truncate">
+<div class="w-8 h-10 rounded bg-surface-container-highest overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Thumbnail snapshot of Sam Altman speaking in studio interview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTXMUFNYw5Q402PbuATovl5qqfIHgLmxi-PCTI-fRIXdqlvLbhURXFebHjJluNEo9JtT76aSEEPHIwO4Hh5ehJyI9fCAwtz8sRGnt7BVKLeQ5SnksF1i3SQZPYEYPcUpxOu925sOegb4pPwJqWDsMYn_g_-WJEckEcOixkGLVHZ1AlCescVEeql2v1hG3z6BC6gyu-xCOhXWzspZVX-fNXKvCEyCAOeU0BPUl_FI4"/>
+</div>
+<div class="flex flex-col truncate">
+<span class="font-title-md text-body-sm text-on-surface truncate">Sam Altman on AGI Horizon</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Duration: 48s • 1080x1920</span>
+</div>
+</div>
+<div class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-[10px] font-bold flex-shrink-0">
+                  virality_score: 99
+                </div>
+</div>
+<!-- Channel Sync Toggles (One-Click Broadcast) -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Active Broadcast Targets</span>
+<!-- TikTok Channel Row -->
+<div class="p-space-xs bg-surface-container rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[18px]">audiotrack</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1">
+<span class="font-title-md text-body-sm text-on-surface">TikTok</span>
+<span class="material-symbols-outlined text-[12px] text-primary">verified</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">@lexclips_ai • Auto-sync sound</span>
+</div>
+</div>
+<!-- Switch Component (Toggled ON) -->
+<button aria-label="Toggle TikTok Sync" class="w-10 h-6 bg-primary rounded-full p-0.5 flex items-center justify-end transition-colors cursor-pointer">
+<div class="w-5 h-5 rounded-full bg-on-primary shadow-sm"></div>
+</button>
+</div>
+<!-- YouTube Shorts Row -->
+<div class="p-space-xs bg-surface-container rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1">
+<span class="font-title-md text-body-sm text-on-surface">YouTube Shorts</span>
+<span class="material-symbols-outlined text-[12px] text-primary">verified</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Fridman Highlights • Auto-tags</span>
+</div>
+</div>
+<button aria-label="Toggle YouTube Shorts Sync" class="w-10 h-6 bg-primary rounded-full p-0.5 flex items-center justify-end transition-colors cursor-pointer">
+<div class="w-5 h-5 rounded-full bg-on-primary shadow-sm"></div>
+</button>
+</div>
+<!-- Instagram Reels Row -->
+<div class="p-space-xs bg-surface-container rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1">
+<span class="font-title-md text-body-sm text-on-surface">Instagram Reels</span>
+<span class="material-symbols-outlined text-[12px] text-primary">verified</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">@clipforge_media • Auto-cover select</span>
+</div>
+</div>
+<button aria-label="Toggle Instagram Sync" class="w-10 h-6 bg-primary rounded-full p-0.5 flex items-center justify-end transition-colors cursor-pointer">
+<div class="w-5 h-5 rounded-full bg-on-primary shadow-sm"></div>
+</button>
+</div>
+</div>
+<!-- AI Generated Hook & Caption Drawer -->
+<div class="bg-surface-container p-space-sm rounded-xl flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">psychology</span> AI Generated Metadata
+                  </span>
+<button class="font-label-sm text-label-sm text-primary hover:underline flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">refresh</span> Regen
+                  </button>
+</div>
+<!-- Title Input -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase">Optimized Video Title</span>
+<div class="p-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface">
+                    The moment everything changed forever... 🤯
+                  </div>
+</div>
+<!-- Description & Hashtag Box -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase">Caption &amp; Smart Hashtags</span>
+<div class="p-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface leading-relaxed">
+                    Sam Altman breaks down the tipping point of compute scaling. You won't believe what happens in 2026.
+                    <span class="text-primary font-label-sm text-body-sm block pt-1">
+                      #agi #tech #podcast #future #shorts #clipforge
+                    </span>
+</div>
+</div>
+<!-- Dispatch Time Selection -->
+<div class="flex flex-col gap-1 pt-1">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase">Distribution Strategy</span>
+<div class="grid grid-cols-2 gap-space-xs">
+<label class="p-2 rounded-lg bg-surface-container-high flex flex-col gap-0.5 cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-[10px] text-on-surface font-semibold">Immediate</span>
+<input checked="" class="accent-primary" name="dispatch" type="radio"/>
+</div>
+<span class="font-label-sm text-[9px] text-on-surface-variant">Post now</span>
+</label>
+<label class="p-2 rounded-lg bg-surface-container-low flex flex-col gap-0.5 cursor-pointer">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-[10px] text-secondary font-semibold">Smart Slot</span>
+<input class="accent-primary" name="dispatch" type="radio"/>
+</div>
+<span class="font-label-sm text-[9px] text-on-surface-variant">Today 6:30 PM (Peak)</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Primary Action Publisher Button -->
+<div class="pt-space-xs pb-space-xs">
+<button class="w-full py-3 px-space-md rounded-xl bg-secondary-container text-on-secondary-container font-title-md text-title-md font-bold tracking-wide flex items-center justify-center gap-space-xs shadow-lg hover:bg-secondary transition-all" id="publish-trigger-btn">
+<span class="material-symbols-outlined text-[20px]">rocket_launch</span>
+                  Publish to All 3 Channels (1-Click)
+                </button>
+</div>
+</div>
+<!-- Native iOS Bottom Tab Bar -->
+<div class="bg-surface-container-lowest/95 backdrop-blur-md px-space-md pt-2 pb-5 flex items-center justify-around z-20">
+<button class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">auto_awesome_motion</span>
+<span class="font-label-sm text-[10px]">Moments</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">video_library</span>
+<span class="font-label-sm text-[10px]">Projects</span>
+</button>
+<div class="relative -top-3">
+<button class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-[22px]">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-0.5 text-secondary">
+<span class="material-symbols-outlined text-[20px]">schedule_send</span>
+<span class="font-label-sm text-[10px] font-bold">Publisher</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-label-sm text-[10px]">Config</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Feature Specification Matrix -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md mt-space-lg">
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">stream</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Live Ingest Agent</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Connect your OBS, RTMP source, or live podcast link. ClipForge listens synchronously in memory, indexing cadence, volume, and viewer sentiment.
+        </p>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[22px]">trending_up</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">AI Virality Scoring</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Trained on 400M+ TikTok &amp; YouTube Shorts views. Evaluates early 3-second hook retention, speaker velocity, and punchline coherence.
+        </p>
+</div>
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-xs">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined text-[22px]">share</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Zero-Friction Multi-Post</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Automatic vertical safe-zone checks, automated hashtag selection, platform-specific audio alignment, and zero desktop rendering delays.
+        </p>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const btn = document.getElementById('publish-trigger-btn');
+    if (btn) {
+      btn.addEventListener('click', function() {
+        const originalContent = this.innerHTML;
+        this.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">refresh</span> Broadcasting 4K Render...';
+        this.classList.add('opacity-90');
+        setTimeout(() => {
+          this.innerHTML = '<span class="material-symbols-outlined text-[20px]">task_alt</span> Published to 3 Networks!';
+          this.classList.remove('opacity-90');
+          this.classList.add('bg-primary', 'text-on-primary');
+          setTimeout(() => {
+            this.innerHTML = originalContent;
+            this.classList.remove('bg-primary', 'text-on-primary');
+          }, 3000);
+        }, 1200);
+      });
+    }
+  })();
+</script></main></div></body></html>

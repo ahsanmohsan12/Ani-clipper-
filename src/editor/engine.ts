@@ -960,3 +960,56 @@ export function redoHistory(stack: HistoryStack): HistoryStack {
     future: newFuture,
   };
 }
+
+/**
+ * Formats seconds into SubRip (.srt) timestamp `HH:MM:SS,mmm`
+ */
+export function formatSrtTimestamp(seconds: number): string {
+  const safe = Math.max(0, seconds);
+  const hours = Math.floor(safe / 3600);
+  const mins = Math.floor((safe % 3600) / 60);
+  const secs = Math.floor(safe % 60);
+  const ms = Math.round((safe - Math.floor(safe)) * 1000);
+  const pad2 = (n: number) => String(n).padStart(2, '0');
+  const pad3 = (n: number) => String(Math.min(999, n)).padStart(3, '0');
+  return `${pad2(hours)}:${pad2(mins)}:${pad2(secs)},${pad3(ms)}`;
+}
+
+/**
+ * Generates a valid SubRip (.srt) subtitle file from the project's captions track (or video clip captions).
+ */
+export function buildSrtFromProject(project: ProjectState): string {
+  const captionClips = project.clips
+    .filter((c) => (c.trackId === 'captions' || (c.captions && c.captions.length > 0)) && !c.muted)
+    .sort((a, b) => a.startTime - b.startTime);
+
+  const blocks: string[] = [];
+  let index = 1;
+
+  for (const clip of captionClips) {
+    if (clip.captions && clip.captions.length > 0) {
+      const start = clip.startTime + clip.captions[0].startOffset;
+      const lastWord = clip.captions[clip.captions.length - 1];
+      const end = Math.max(start + 0.5, clip.startTime + lastWord.endOffset);
+      const line = clip.captions.map((w) => w.word).join(' ');
+      blocks.push(`${index}\n${formatSrtTimestamp(start)} --> ${formatSrtTimestamp(end)}\n${line}`);
+      index += 1;
+    } else if (clip.trackId === 'captions') {
+      blocks.push(
+        `${index}\n${formatSrtTimestamp(clip.startTime)} --> ${formatSrtTimestamp(
+          clip.startTime + clip.duration
+        )}\n${clip.name}`
+      );
+      index += 1;
+    }
+  }
+
+  if (blocks.length === 0) {
+    blocks.push(
+      `1\n00:00:00,000 --> ${formatSrtTimestamp(Math.min(5, project.duration))}\n${project.title}`
+    );
+  }
+
+  return blocks.join('\n\n') + '\n';
+}
+

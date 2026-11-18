@@ -17,6 +17,8 @@ import {
   pushHistory,
   undoHistory,
   redoHistory,
+  formatSrtTimestamp,
+  buildSrtFromProject,
   type TimelineClip,
   type ProjectState,
 } from './engine';
@@ -234,3 +236,12 @@ test('history stack supports undo and redo accurately', () => {
   stack = redoHistory(stack);
   assert.equal(stack.present.title, 'Updated Title');
 });
+
+test('buildSrtFromProject formats valid SRT subtitle blocks from timeline captions', () => {
+  assert.equal(formatSrtTimestamp(1.5), '00:00:01,500');
+  const proj = makeSampleProject();
+  const srt = buildSrtFromProject(proj);
+  assert.ok(srt.includes('00:00:00,500 --> 00:00:06,500'));
+  assert.ok(srt.includes('Watch the landing'));
+});
+
